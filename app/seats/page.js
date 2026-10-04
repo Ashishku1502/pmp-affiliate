@@ -50,6 +50,8 @@ export default function Seats() {
       </div>
       <div className="grid">
         {seats.filter((s) => flt === 'All' || s.t === flt).map((s) => {
+          const out = user && user.md === 'Single' && s.a !== user.ar;
+          return (
             <div className="card" key={s.id} style={{ position: 'relative', borderTop: s.by ? '4px solid var(--line)' : '4px solid var(--gold)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div>
