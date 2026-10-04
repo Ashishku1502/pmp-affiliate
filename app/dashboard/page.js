@@ -38,17 +38,53 @@ export default function Dashboard() {
 
   return (
     <section className="sec"><div className="w">
-      <div className="card" style={{ display: 'flex', flexWrap: 'wrap', gap: 14, justifyContent: 'space-between', alignItems: 'center' }}>
-        <div><h3 style={{ margin: 0 }}>{user.n}</h3><small>{user.code} · {user.plan.n} ({user.r}%) · {user.md === 'Single' ? user.ar : 'Freehand'}</small></div>
-        <span className="tag ok"><Check size={12} className="nav-icon" /> KYC verified · Active</span>
+      <div className="card" style={{ background: 'linear-gradient(135deg, var(--navy) 0%, var(--deep) 100%)', color: '#fff', border: 'none', position: 'relative', overflow: 'hidden', padding: '32px 24px', display: 'flex', flexWrap: 'wrap', gap: 20, justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '10px' }}>
+            <h2 style={{ margin: 0, color: '#fff', fontSize: '1.8rem' }}>Hello, {user.n} 👋</h2>
+            <span className="tag ok" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', padding: '4px 10px' }}><Check size={12} className="nav-icon" /> Active</span>
+          </div>
+          <p style={{ color: '#c3cbe8', margin: 0, fontSize: '0.95rem', display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <span><strong style={{ color: 'var(--gold)', fontWeight: 900 }}>CODE:</strong> {user.code}</span>
+            <span style={{ opacity: 0.5 }}>|</span>
+            <span><strong style={{ color: 'var(--gold)', fontWeight: 900 }}>PLAN:</strong> {user.plan.n} ({user.r}%)</span>
+            <span style={{ opacity: 0.5 }}>|</span>
+            <span><strong style={{ color: 'var(--gold)', fontWeight: 900 }}>ZONE:</strong> {user.md === 'Single' ? user.ar : 'Freehand'}</span>
+          </p>
+        </div>
+        <div style={{ position: 'absolute', right: '-20px', top: '-40px', opacity: 0.05, transform: 'rotate(-10deg)' }}>
+          <LayoutDashboard size={200} />
+        </div>
       </div>
-      <div className="tabs">{TABS.map((x) => { const I = TAB_ICONS[x]; return <button key={x} className={'btn s ' + (tab === x ? '' : 'o')} onClick={() => setTab(x)}><I size={13} className="nav-icon" />{x}</button>; })}</div>
+      <div className="tabs" style={{ background: 'var(--card)', padding: '8px', borderRadius: '12px', border: '1px solid var(--line)', gap: '6px' }}>
+        {TABS.map((x) => { 
+          const I = TAB_ICONS[x]; 
+          return <button key={x} className={'btn s ' + (tab === x ? '' : 'o')} style={{ flex: 1, minWidth: 'fit-content', border: tab === x ? 'none' : 'none', background: tab === x ? 'var(--gold)' : 'transparent', color: tab === x ? '#1a1200' : 'var(--muted)', fontWeight: tab === x ? '900' : '600' }} onClick={() => setTab(x)}>
+            <I size={15} className="nav-icon" style={{ marginRight: '6px' }} />{x}
+          </button>; 
+        })}
+      </div>
 
       {tab === 'Dashboard' && <>
-        <div className="grid">
-          <div className="card"><div className="stat-icon"><TrendingUp size={20} /></div><small>Revenue (Paid)</small><div className="price">{R(earned)}</div></div>
-          <div className="card"><div className="stat-icon"><MapPin size={20} /></div><small>Booked seats</small><div className="price">{mine.length}</div></div>
-          <div className="card"><div className="stat-icon"><AlertCircle size={20} /></div><small>Unpaid seats</small><div className="price">{mine.filter((s) => !s.paid).length}</div></div>
+        <div className="grid" style={{ marginTop: '24px' }}>
+          <div className="card" style={{ borderTop: '4px solid var(--gold)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div><small style={{ color: 'var(--muted)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Total Revenue</small><div className="price" style={{ marginTop: '6px' }}>{R(earned)}</div></div>
+              <div className="stat-icon" style={{ background: '#fef3e0', color: '#a06010', margin: 0 }}><TrendingUp size={22} /></div>
+            </div>
+          </div>
+          <div className="card" style={{ borderTop: '4px solid var(--blue)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div><small style={{ color: 'var(--muted)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Booked Seats</small><div className="price" style={{ marginTop: '6px' }}>{mine.length}</div></div>
+              <div className="stat-icon" style={{ background: 'var(--pale)', color: 'var(--blue)', margin: 0 }}><MapPin size={22} /></div>
+            </div>
+          </div>
+          <div className="card" style={{ borderTop: '4px solid #e11d48' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div><small style={{ color: 'var(--muted)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>Unpaid Seats</small><div className="price" style={{ marginTop: '6px', color: mine.filter((s) => !s.paid).length > 0 ? '#e11d48' : 'var(--h)' }}>{mine.filter((s) => !s.paid).length}</div></div>
+              <div className="stat-icon" style={{ background: '#ffe4e6', color: '#e11d48', margin: 0 }}><AlertCircle size={22} /></div>
+            </div>
+          </div>
         </div>
         <div className="card" style={{ marginTop: 16 }}><h3>Hafte ke bookings</h3>
           <div className="chart">{wk.map((v, i) => <div key={i} style={{ height: `${v / mx * 100}%` }}>{v || ''}</div>)}</div>
