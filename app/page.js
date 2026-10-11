@@ -1,272 +1,480 @@
 import Link from 'next/link';
-import { COMM, PRICE, PLAN, R } from '@/lib/constants';
 import {
-  UserCheck, MapPin, FileText, Wallet,
-  TrendingUp, Map as MapIcon, BookOpen,
-  UserPlus, ArrowRight, Lock, Zap, Award,
-  IndianRupee, ShieldCheck, HelpCircle, Star, ChevronDown,
+  LayoutDashboard, Users, CheckSquare, Database, Video, Compass,
+  BarChart3, Building, Home as HomeIcon, Layers, Award, UserPlus,
+  ArrowRight, ShieldCheck, MessageSquare, LogIn, Target, ChevronRight
 } from 'lucide-react';
 
-const STEPS = [
-  { icon: UserCheck, title: 'Affiliate banein', desc: 'Details, OTP, area aur plan chuniye. Payment ke baad aapka Affiliate Code ban jata hai.' },
-  { icon: MapPin,    title: 'Seat book kijiye', desc: 'MLA ya Pradhan ki seat chuniye, candidate ki details bhariye aur OTP se verify kijiye.' },
-  { icon: FileText,  title: 'Candidate plan le', desc: 'Candidate PMP plan leta hai. Payment booking ke time ya baad mein ho sakti hai.' },
-  { icon: Wallet,    title: 'Payout paayein', desc: 'Seat Paid hote hi aapka commission dashboard mein aa jata hai.' },
+const KEY_SOLUTIONS = [
+  {
+    num: '01',
+    icon: LayoutDashboard,
+    title: 'Dashboard & Ground Reports',
+    desc: 'View area-related reports, ongoing activities, and available performance information from one dashboard.',
+    tag: 'Live Dashboard',
+    color: 'var(--blue)'
+  },
+  {
+    num: '02',
+    icon: Users,
+    title: 'Team Management',
+    desc: 'Organize your team members, assign responsibilities, and make it easier for everyone to stay coordinated.',
+    tag: 'Team Coordination',
+    color: 'var(--gold)'
+  },
+  {
+    num: '03',
+    icon: CheckSquare,
+    title: 'Activity Management',
+    desc: 'Create activities, assign tasks to team members, and track progress in one place.',
+    tag: 'Task Progress',
+    color: '#10b981'
+  },
+  {
+    num: '04',
+    icon: Database,
+    title: 'Voter Management',
+    desc: 'Organize authorized voter records and field-collected information in a structured format, with appropriate access controls.',
+    tag: 'Data Organization',
+    color: '#8b5cf6'
+  },
+  {
+    num: '05',
+    icon: Video,
+    title: 'Learning Videos & Courses',
+    desc: 'Access useful videos and learning resources to improve your understanding of political management and ground operations.',
+    tag: 'Training Library',
+    color: '#ec4899'
+  },
+  {
+    num: '06',
+    icon: Compass,
+    title: 'Strategies & Frameworks',
+    desc: 'Explore practical ideas, planning methods, and frameworks to help organize area management and field activities.',
+    tag: 'Strategic Frameworks',
+    color: '#06b6d4'
+  },
+  {
+    num: '07',
+    icon: BarChart3,
+    title: 'Performance Score & Analytics',
+    desc: 'Understand activity progress and available performance indicators through organized reports and analytics.',
+    tag: 'Metrics & Analytics',
+    color: '#f97316'
+  }
 ];
 
-const BENEFITS = [
-  [IndianRupee, `${COMM}% commission har successful sale par`],
-  [MapPin,      'Exclusive territory lock — sirf aap kaam karenge'],
-  [BookOpen,    'Free DRM Training Course included'],
-  [TrendingUp,  'Real-time earnings dashboard'],
-  [MapIcon,     'MLA aur Pradhan dono seats book kar sakte hain'],
-  [Award,       'Verified Affiliate Code milta hai'],
+const BENEFIT_GROUPS = [
+  {
+    icon: Building,
+    title: 'MLA & Assembly-Level Representatives',
+    desc: 'Manage assembly-level teams, coordinate activities, and keep track of ground-level reports.',
+    badge: 'Assembly Level',
+    color: 'var(--blue)'
+  },
+  {
+    icon: HomeIcon,
+    title: 'Gram Pradhans',
+    desc: 'Organize village-level teams, manage assigned activities, and review area-related information.',
+    badge: 'Village Level',
+    color: 'var(--gold)'
+  },
+  {
+    icon: Layers,
+    title: 'Zila Panchayat Representatives',
+    desc: 'Coordinate district-level responsibilities, organize teams, and monitor activities across assigned areas.',
+    badge: 'District Level',
+    color: '#10b981'
+  },
+  {
+    icon: Award,
+    title: 'Political Candidates',
+    desc: 'Plan and organize your team, area-related activities, and ground operations more systematically.',
+    badge: 'Candidates',
+    color: '#8b5cf6'
+  },
+  {
+    icon: UserPlus,
+    title: 'Affiliate Partners',
+    desc: 'Introduce Poll Craft Analytics products to potential customers in your approved territory and explore opportunities to grow your business.',
+    badge: 'Business Partners',
+    color: '#ec4899'
+  }
 ];
 
-const FAQ = [
-  ['Affiliate banne ke liye kya chahiye?',
-   'Aapka naam, 10 ank ka mobile number aur KYC (Aadhaar/PAN) chahiye. Ek refundable security deposit bhi lagta hai jo baad mein wapas milta hai.'],
-  ['Commission kab milta hai?',
-   'Jab aapki booked seat ka payment complete ho jata hai, turant aapke dashboard mein commission dikh jata hai. Koi delay nahi.'],
-  ['Security deposit wapas milta hai?',
-   'Haan, ye deposit 100% refundable hai. Ye aapka paisa hai — program se bahar nikalne par ya kisi bhi wajah se wapas mil sakta hai.'],
-  ['Ek se zyada seats book kar sakte hain?',
-   'Bilkul. Aap apne territory mein jitni available seats hain, sab book kar sakte hain. Har paid seat par alag commission milta hai.'],
-  ['Kya main kisi bhi area mein kaam kar sakta hoon?',
-   'Haan. Freehand mode mein aap kisi bhi available seat ko book kar sakte hain. Specific Area mode mein sirf apna locked territory milta hai.'],
+const GET_STARTED_OPTIONS = [
+  {
+    icon: LayoutDashboard,
+    title: 'Explore Our Products',
+    desc: 'Discover digital tools designed to support political and ground-level management.',
+    btnText: 'View Digital Products',
+    href: '/products',
+    primary: true
+  },
+  {
+    icon: UserPlus,
+    title: 'Become an Affiliate',
+    desc: 'Learn how to introduce our products and explore partnership opportunities.',
+    btnText: 'Join Partner Program',
+    href: '/join',
+    primary: false
+  },
+  {
+    icon: LogIn,
+    title: 'Login to Your Dashboard',
+    desc: 'Access your dashboard and available platform features.',
+    btnText: 'Dashboard Login',
+    href: '/login',
+    primary: false
+  },
+  {
+    icon: MessageSquare,
+    title: 'Contact Us',
+    desc: 'Have a question or want to know more? Get in touch with our team.',
+    btnText: 'Get in Touch',
+    href: '/contact',
+    primary: false
+  }
 ];
 
 export default function Home() {
-  const perSeat  = PRICE * COMM / 100;
-  const example  = 5 * perSeat;
+  return (
+    <>
+      {/* ── 1. HERO SECTION ── */}
+      <header className="hero fade-in">
+        <div className="hero-bg-circle" />
+        <div className="hero-bg-circle2" />
+        <div className="w">
+          <div className="hero-content">
+            
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '99px', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.28)', color: 'var(--gold)', marginBottom: '18px', fontSize: '0.88rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <ShieldCheck size={16} /> Poll Craft Analytics
+            </div>
 
-  return (<>
+            <h1 className="hero-h1">
+              Manage Your Area, Team, and Ground Activities in One Place
+            </h1>
 
-    {/* ── HERO ── */}
-    <header className="hero">
-      <div className="hero-bg-circle" />
-      <div className="hero-bg-circle2" />
-      <div className="w" style={{ position: 'relative', zIndex: 1 }}>
+            <p className="hero-sub fade-in delay-1" style={{ fontSize: 'clamp(1.05rem, 2.5vw, 1.25rem)', color: 'rgba(255, 255, 255, 0.92)', lineHeight: '1.7', maxWidth: '820px', margin: '0 auto 20px' }}>
+              Poll Craft Analytics helps political representatives, candidates, and their teams manage their areas, coordinate team members, track activities, and organize ground-level reports through one digital platform.
+            </p>
 
-        <h1 className="hero-h1">
-          Apne area ke Pradhan aur MLA ko PMP dilaiye.<br />
-          <span style={{ color: 'var(--gold)' }}>Har sale par {COMM}% commission kamaiye.</span>
-        </h1>
-        <p className="hero-sub">
-          PMP ek political operations platform hai — team, survey, training aur dashboard ek jagah.
-          Aap bas customer laate hain, baaki hum sambhalte hain.
-        </p>
+            <p style={{ color: 'rgba(255, 255, 255, 0.72)', fontSize: '1.05rem', margin: '0 auto 36px', maxWidth: '720px', fontWeight: '500' }}>
+              Our goal is to make political and ground-level management simpler, more organized, and easier to track.
+            </p>
 
-        <div className="kpis">
-          <div className="kpi">
-            <TrendingUp size={22} style={{ color: 'var(--gold)', display: 'block', marginBottom: 6 }} />
-            <b>{COMM}%</b><span>commission har sale par</span>
-          </div>
-          <div className="kpi">
-            <IndianRupee size={22} style={{ color: 'var(--gold)', display: 'block', marginBottom: 6 }} />
-            <b>{R(perSeat)}</b><span>per seat kamayi</span>
-          </div>
-          <div className="kpi">
-            <MapIcon size={22} style={{ color: 'var(--gold)', display: 'block', marginBottom: 6 }} />
-            <b>MLA + Pradhan</b><span>dono seats available</span>
+            {/* CTAs */}
+            <div className="hero-btns fade-in delay-2" style={{ gap: '14px', justifyContent: 'center' }}>
+              <Link className="btn" href="/products" style={{ padding: '18px 34px', fontSize: '1.05rem' }}>
+                <LayoutDashboard size={20} className="nav-icon" /> Explore Our Products
+              </Link>
+              <Link className="btn g" href="/join" style={{ padding: '18px 34px', fontSize: '1.05rem', background: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+                <UserPlus size={20} className="nav-icon" /> Become an Affiliate
+              </Link>
+              <Link className="btn o" href="/login" style={{ padding: '18px 30px', fontSize: '1.05rem', color: '#fff', borderColor: 'rgba(255, 255, 255, 0.3)' }}>
+                <LogIn size={20} className="nav-icon" /> Login to Your Dashboard
+              </Link>
+            </div>
+
+            {/* Trust highlights */}
+            <div className="hero-trust fade-in delay-3" style={{ marginTop: '40px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckSquare size={16} style={{ color: 'var(--gold)' }} /> Area Management
+              </span>
+              <span style={{ opacity: 0.3 }}>|</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Users size={16} style={{ color: 'var(--blue)' }} /> Team Coordination
+              </span>
+              <span style={{ opacity: 0.3 }}>|</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <BarChart3 size={16} style={{ color: '#10b981' }} /> Ground-Level Reporting
+              </span>
+            </div>
+
           </div>
         </div>
+      </header>
 
-        <div className="hero-btns">
-          <Link className="btn hero-cta" href="/join">
-            <UserPlus size={17} className="nav-icon" /> Affiliate Banein — Free
-          </Link>
-          <Link className="btn g" href="/seats">
-            <MapIcon size={16} className="nav-icon" /> Seats dekhiye
-          </Link>
+
+      {/* ── 2. POLITICAL MANAGEMENT MADE SIMPLE AND ORGANIZED ── */}
+      <section className="sec alt">
+        <div className="w">
+          <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: '32px', padding: 'clamp(32px, 5vw, 60px)', boxShadow: '0 20px 40px rgba(0,0,0,0.03)' }}>
+            
+            <div style={{ maxWidth: '880px', margin: '0 auto 48px', textAlign: 'center' }}>
+              <span className="tag" style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--blue)', marginBottom: '16px' }}>
+                Simplified Ground Operations
+              </span>
+              <h2 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: '800', lineHeight: '1.25', margin: '0 0 20px' }}>
+                Political Management Made Simple and Organized
+              </h2>
+              <p style={{ color: 'var(--text)', fontSize: '1.15rem', lineHeight: '1.8', margin: '0 0 16px', fontWeight: '500' }}>
+                Managing people, teams, field activities, and information across different areas can be challenging.
+              </p>
+              <p style={{ color: 'var(--muted)', fontSize: '1.05rem', lineHeight: '1.8', margin: 0 }}>
+                Poll Craft Analytics brings these tasks together in one place, helping you organize daily work, coordinate your team, monitor activities, and access important reports more easily.
+              </p>
+            </div>
+
+            {/* Sub-heading for Solutions */}
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+              <h3 style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--h)', margin: '0 0 8px', letterSpacing: '-0.5px' }}>
+                Our Key Solutions
+              </h3>
+              <p style={{ color: 'var(--muted)', fontSize: '1rem', margin: 0 }}>
+                Digital modules built for seamless coordination and empirical field insights
+              </p>
+            </div>
+
+            {/* 7 Solutions Grid */}
+            <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '22px' }}>
+              {KEY_SOLUTIONS.map(({ num, icon: Icon, title, desc, tag, color }) => (
+                <div
+                  key={title}
+                  style={{
+                    padding: '28px',
+                    background: 'var(--pale)',
+                    borderRadius: '20px',
+                    border: '1px solid var(--line)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    transition: 'all 0.25s ease'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                      <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: `${color}15`, color: color, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${color}30` }}>
+                        <Icon size={22} />
+                      </div>
+                      <span style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--muted)', opacity: 0.7, letterSpacing: '1px' }}>
+                        {num}
+                      </span>
+                    </div>
+
+                    <span className="tag" style={{ background: `${color}15`, color: color, fontSize: '0.75rem', fontWeight: '700', marginBottom: '10px' }}>
+                      {tag}
+                    </span>
+
+                    <h4 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--h)', margin: '6px 0 12px', lineHeight: '1.35' }}>
+                      {title}
+                    </h4>
+
+                    <p style={{ color: 'var(--muted)', fontSize: '0.96rem', lineHeight: '1.65', margin: 0 }}>
+                      {desc}
+                    </p>
+                  </div>
+
+                  <div style={{ marginTop: '20px', paddingTop: '14px', borderTop: '1px solid var(--line)' }}>
+                    <Link href="/products" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.88rem', fontWeight: '700', color: color, textDecoration: 'none' }}>
+                      Learn Details <ChevronRight size={14} />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+          </div>
         </div>
-        <p className="hero-trust">
-          <ShieldCheck size={13} className="nav-icon" /> KYC verified &nbsp;•&nbsp;
-          Refundable deposit &nbsp;•&nbsp; 100% demo safe
-        </p>
-      </div>
-    </header>
+      </section>
 
-    {/* ── EARNINGS CALCULATOR ── */}
-    <section className="sec earn-sec">
-      <div className="w">
-        <div className="earn-banner">
-          <div className="earn-left">
-            <h2 style={{ margin: 0 }}>Aap kitna kama sakte hain?</h2>
-            <p style={{ margin: '6px 0 0', color: 'var(--muted)' }}>
-              Example: 5 seats book ki, sab paid ho gayi
+
+      {/* ── 3. WHO CAN BENEFIT FROM POLL CRAFT ANALYTICS? ── */}
+      <section className="sec" id="audience">
+        <div className="w">
+          <div className="sec-header">
+            <span className="tag" style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--blue)', marginBottom: '16px' }}>
+              Target Stakeholders
+            </span>
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: '800', margin: '0 0 12px' }}>
+              Who Can Benefit from Poll Craft Analytics?
+            </h2>
+            <p style={{ maxWidth: '680px', margin: '0 auto', fontSize: '1.08rem' }}>
+              Tailored digital tools designed specifically for representatives, local bodies, candidates, and territory business partners.
             </p>
           </div>
-          <div className="earn-calc">
-            <div className="earn-row">
-              <span>5 seats × {R(PRICE)}</span>
-              <span>{R(5 * PRICE)}</span>
-            </div>
-            <div className="earn-row">
-              <span>{COMM}% commission aapka</span>
-              <span className="earn-val">{R(example)}</span>
-            </div>
-          </div>
-          <Link className="btn" href="/join">
-            <UserPlus size={15} className="nav-icon" /> Abhi shuru karein
-          </Link>
-        </div>
-      </div>
-    </section>
 
-    {/* ── HOW IT WORKS ── */}
-    <section className="sec"><div className="w">
-      <div className="sec-header">
-        <h2>Aap kaise kamaayenge?</h2>
-        <p>Sirf 4 simple steps. Poora process guided aur easy hai.</p>
-      </div>
-      <div className="how-grid">
-        {STEPS.map(({ icon: Icon, title, desc }, i) => (
-          <div className="how-card" key={title}>
-            <div className="how-num">0{i + 1}</div>
-            <div className="step-icon"><Icon size={24} /></div>
-            <h3>{title}</h3>
-            <p style={{ margin: 0, color: 'var(--muted)', fontSize: '.95rem' }}>{desc}</p>
-          </div>
-        ))}
-      </div>
-    </div></section>
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px' }}>
+            {BENEFIT_GROUPS.map(({ icon: Icon, title, desc, badge, color }, i) => (
+              <div
+                className="card fade-in"
+                key={title}
+                style={{
+                  animationDelay: `${i * 0.1}s`,
+                  borderTop: `4px solid ${color}`,
+                  padding: 'clamp(24px, 4vw, 34px)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                    <div className="step-icon" style={{ margin: 0, width: '48px', height: '48px', background: `${color}15`, color: color, border: `1px solid ${color}30` }}>
+                      <Icon size={24} />
+                    </div>
+                    <span className="tag" style={{ background: `${color}15`, color: color, fontSize: '0.8rem', fontWeight: '700' }}>
+                      {badge}
+                    </span>
+                  </div>
 
-    {/* ── BENEFITS + PRICING ── */}
-    <section className="sec alt"><div className="w">
-      <div className="benefits-layout">
+                  <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '12px', lineHeight: '1.35', color: 'var(--h)' }}>
+                    {title}
+                  </h3>
 
-        <div>
-          <h2>Affiliate banne mein aapko kya milega?</h2>
-          <p style={{ color: 'var(--muted)' }}>
-            Ek complete toolkit jo aapko apne area mein successful banati hai.
-          </p>
-          <ul className="benefits-list">
-            {BENEFITS.map(([Icon, text]) => (
-              <li key={text}>
-                <span className="benefit-icon"><Icon size={16} /></span>
-                {text}
-              </li>
+                  <p style={{ color: 'var(--muted)', fontSize: '1rem', lineHeight: '1.65', margin: 0 }}>
+                    {desc}
+                  </p>
+                </div>
+
+                <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--line)' }}>
+                  <Link href="/products" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', fontWeight: '700', color: color, textDecoration: 'none' }}>
+                    Explore Solutions <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </div>
             ))}
-          </ul>
-          <Link className="btn" href="/join">
-            <UserPlus size={15} className="nav-icon" /> Affiliate banein
-          </Link>
-        </div>
-
-        <div className="card p pricing-card">
-          <div className="tag ok" style={{ marginBottom: 12 }}>
-            <Star size={11} className="nav-icon" /> Most Popular
           </div>
-          <h3 style={{ marginBottom: 4 }}>Affiliate Partner</h3>
-          <p style={{ color: 'var(--muted)', fontSize: '.9rem', margin: '0 0 10px' }}>
-            Commission per paid seat
-          </p>
-          <div className="price">{R(perSeat)}</div>
-          <p style={{ fontSize: '.85rem', color: 'var(--muted)', marginBottom: 16 }}>per seat · {COMM}% of {R(PRICE)}</p>
-          <ul className="t">
-            <li>{COMM}% commission har successful sale par</li>
-            <li>Apna unique Affiliate Code</li>
-            <li>Dashboard, Learnings, Bookings, Help</li>
-            <li>MLA aur Pradhan seats book karne ki suvidha</li>
-            <li>Territory lock (Specific ya Freehand)</li>
-          </ul>
-          <Link className="btn" href="/join"
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            <UserPlus size={15} /> Abhi join karein
-          </Link>
-          <p style={{ textAlign: 'center', marginTop: 10, fontSize: '.82rem', color: 'var(--muted)' }}>
-            <ShieldCheck size={12} className="nav-icon" /> Deposit: {R(PLAN.fee)} · 100% refundable
-          </p>
         </div>
+      </section>
 
-      </div>
-    </div></section>
 
-    {/* ── TERRITORY TYPES ── */}
-    <section className="sec"><div className="w">
-      <div className="sec-header">
-        <h2>Do tarah ka territory</h2>
-        <p>Apni working style ke hisaab se choose karein.</p>
-      </div>
-      <div className="grid">
-        <div className="card" style={{ borderTop: '4px solid var(--navy)' }}>
-          <div className="step-icon" style={{ background: 'var(--pale)', color: 'var(--navy)' }}>
-            <Lock size={24} />
+      {/* ── 4. LEARN. ORGANIZE. MANAGE. (PHILOSOPHY & VALUE BANNER) ── */}
+      <section className="sec alt" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+        <div className="w">
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #020617 0%, #0f172a 100%)',
+              color: '#fff',
+              borderRadius: '32px',
+              padding: 'clamp(36px, 6vw, 68px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 24px 48px rgba(0,0,0,0.3)',
+              textAlign: 'center',
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Subtle background glow */}
+            <div style={{ position: 'absolute', top: '-40%', left: '50%', transform: 'translateX(-50%)', width: '400px', height: '300px', background: 'radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+            <div style={{ position: 'relative', zIndex: 1, maxWidth: '820px', margin: '0 auto' }}>
+              <span className="tag" style={{ background: 'rgba(245, 158, 11, 0.15)', color: 'var(--gold)', border: '1px solid rgba(245, 158, 11, 0.3)', marginBottom: '18px', padding: '6px 16px', fontSize: '0.85rem' }}>
+                Platform Philosophy
+              </span>
+
+              <h2 style={{ fontSize: 'clamp(2.4rem, 5vw, 3.6rem)', fontWeight: '900', color: '#fff', letterSpacing: '-1px', margin: '0 0 20px', fontFamily: "'Outfit', sans-serif" }}>
+                Learn. Organize. Manage.
+              </h2>
+
+              <p style={{ fontSize: 'clamp(1.15rem, 2.5vw, 1.35rem)', color: 'rgba(255, 255, 255, 0.95)', fontWeight: '600', lineHeight: '1.6', margin: '0 0 16px' }}>
+                We believe that better organization leads to better coordination.
+              </p>
+
+              <p style={{ fontSize: '1.05rem', color: 'rgba(255, 255, 255, 0.75)', lineHeight: '1.8', margin: '0 auto 36px', maxWidth: '720px' }}>
+                Poll Craft Analytics aims to bring teams, activities, reports, and learning resources together so users can manage their work more efficiently and make informed decisions based on available information.
+              </p>
+
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                <Link className="btn" href="/products" style={{ padding: '16px 32px' }}>
+                  <LayoutDashboard size={18} className="nav-icon" /> View All Products
+                </Link>
+                <Link className="btn o" href="/join" style={{ padding: '16px 30px', color: '#fff', borderColor: 'rgba(255, 255, 255, 0.3)' }}>
+                  <UserPlus size={18} className="nav-icon" /> Partner With Us
+                </Link>
+              </div>
+            </div>
           </div>
-          <span className="tag" style={{ background: 'var(--pale)', color: 'var(--navy)', marginBottom: 12, display: 'inline-block' }}>
-            Exclusive
-          </span>
-          <h3>Specific Area</h3>
-          <p style={{ color: 'var(--muted)' }}>
-            Ek ward ya territory aapke naam lock ho jati hai.
-            Us area mein sirf aap kaam karenge — koi competition nahi.
-          </p>
-          <Link className="btn o" href="/join">
-            <ArrowRight size={14} className="nav-icon" /> Ye mode chuniye
-          </Link>
         </div>
-        <div className="card" style={{ borderTop: '4px solid var(--gold)' }}>
-          <div className="step-icon" style={{ background: '#fef3e0', color: '#a06010' }}>
-            <Zap size={24} />
+      </section>
+
+
+      {/* ── 5. GET STARTED WITH POLL CRAFT ANALYTICS ── */}
+      <section className="sec" id="get-started">
+        <div className="w">
+          <div className="sec-header">
+            <span className="tag" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', marginBottom: '16px' }}>
+              Action Hub
+            </span>
+            <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: '800', margin: '0 0 12px' }}>
+              Get Started with Poll Craft Analytics
+            </h2>
+            <p style={{ maxWidth: '760px', margin: '0 auto', fontSize: '1.08rem' }}>
+              Whether you are a political representative, a candidate, a team member, or someone interested in becoming an affiliate, we have options to help you get started.
+            </p>
           </div>
-          <span className="tag" style={{ background: '#fef3e0', color: '#a06010', marginBottom: 12, display: 'inline-block' }}>
-            Flexible
-          </span>
-          <h3>Freehand</h3>
-          <p style={{ color: 'var(--muted)' }}>
-            Kisi bhi city ya zone mein kaam kijiye.
-            Jahan seat available ho wahan book kijiye — maximum reach aur flexibility.
-          </p>
-          <Link className="btn" href="/join">
-            <ArrowRight size={14} className="nav-icon" /> Ye mode chuniye
-          </Link>
+
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '24px' }}>
+            {GET_STARTED_OPTIONS.map(({ icon: Icon, title, desc, btnText, href, primary }) => (
+              <div
+                key={title}
+                className="card fade-in"
+                style={{
+                  padding: 'clamp(24px, 4vw, 32px)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  borderRadius: '24px',
+                  border: primary ? '2px solid var(--gold)' : '1px solid var(--line)',
+                  background: primary ? 'linear-gradient(180deg, #fff 0%, #fffbeb 100%)' : '#fff'
+                }}
+              >
+                <div>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: primary ? 'var(--gold)' : 'var(--pale)', color: primary ? '#fff' : 'var(--navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+                    <Icon size={24} />
+                  </div>
+
+                  <h3 style={{ fontSize: '1.3rem', fontWeight: '800', color: 'var(--h)', margin: '0 0 10px' }}>
+                    {title}
+                  </h3>
+
+                  <p style={{ color: 'var(--muted)', fontSize: '0.98rem', lineHeight: '1.65', margin: '0 0 24px' }}>
+                    {desc}
+                  </p>
+                </div>
+
+                <Link
+                  href={href}
+                  className={primary ? 'btn' : 'btn o'}
+                  style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    padding: '14px 20px',
+                    fontSize: '0.96rem',
+                    textDecoration: 'none'
+                  }}
+                >
+                  {btnText} <ArrowRight size={16} className="nav-icon" style={{ marginLeft: '6px' }} />
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Closing Brand Statement Banner */}
+          <div
+            style={{
+              marginTop: '48px',
+              padding: '24px 28px',
+              borderRadius: '20px',
+              background: 'var(--pale)',
+              border: '1px solid var(--line)',
+              textAlign: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              flexWrap: 'wrap'
+            }}
+          >
+            <Target size={20} style={{ color: 'var(--gold)' }} />
+            <strong style={{ fontSize: '1.05rem', color: 'var(--navy)', letterSpacing: '-0.2px' }}>
+              Poll Craft Analytics — Bringing Teams, Activities, and Ground-Level Information Together.
+            </strong>
+          </div>
+
         </div>
-      </div>
-    </div></section>
-
-    {/* ── FAQ ── */}
-    <section className="sec alt"><div className="w">
-      <div className="sec-header">
-        <h2>Aksar pooche jaane wale sawaal</h2>
-        <p>Koi sawaal ho toh dashboard ke Help tab mein ticket bhej sakte hain.</p>
-      </div>
-      <div className="faq-list">
-        {FAQ.map(([q, a]) => (
-          <details className="faq-item" key={q}>
-            <summary>
-              <HelpCircle size={16} style={{ color: 'var(--gold)', flexShrink: 0 }} />
-              {q}
-              <span className="faq-chevron"><ChevronDown size={16} /></span>
-            </summary>
-            <p>{a}</p>
-          </details>
-        ))}
-      </div>
-    </div></section>
-
-    {/* ── FINAL CTA ── */}
-    <section className="cta-section">
-      <div className="w" style={{ textAlign: 'center' }}>
-        <span className="tag" style={{ background: 'rgba(255,255,255,.15)', color: '#fff', marginBottom: 20, display: 'inline-block' }}>
-          <Star size={11} className="nav-icon" /> Limited seats available
-        </span>
-        <h2 style={{ color: '#fff', fontSize: 'clamp(1.8rem,5vw,2.8rem)', maxWidth: '14em', margin: '0 auto 16px' }}>
-          Aaj hi shuru karein aur apne area mein pehle affiliate banein
-        </h2>
-        <p style={{ color: 'rgba(255,255,255,.65)', maxWidth: '34em', margin: '0 auto 32px', fontSize: '1.05rem' }}>
-          Apne area ke MLA aur Pradhan candidates ko PMP dilaiye aur har paid seat par {R(perSeat)} kamaiye.
-        </p>
-        <Link className="btn" href="/join"
-          style={{ fontSize: '1.05rem', padding: '15px 36px', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <UserPlus size={18} /> Affiliate Banein — Free to Join
-        </Link>
-        <p style={{ marginTop: 18, color: 'rgba(255,255,255,.4)', fontSize: '.85rem' }}>
-          <ShieldCheck size={13} className="nav-icon" />
-          Secure &nbsp;•&nbsp; Refundable deposit &nbsp;•&nbsp; Cancel anytime
-        </p>
-      </div>
-    </section>
-
-  </>);
+      </section>
+    </>
+  );
 }
