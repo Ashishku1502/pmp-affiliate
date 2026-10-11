@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ShieldCheck, Mail, Phone, MapPin, ArrowRight, X, CheckCircle,
-  FileText, Lock, ArrowUp, ExternalLink,
+  FileText, Lock, Award, ArrowUp, ExternalLink,
   MessageCircle, Clock, Copy, Check, Printer, ChevronRight, Building
 } from 'lucide-react';
 
