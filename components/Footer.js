@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ShieldCheck, Mail, Phone, MapPin, ArrowRight, X, CheckCircle,
-  FileText, Lock, Award, IndianRupee, ArrowUp, ExternalLink,
+  FileText, Lock, ArrowUp, ExternalLink,
   MessageCircle, Clock, Copy, Check, Printer, ChevronRight, Building
 } from 'lucide-react';
 
@@ -117,8 +117,6 @@ const LEGAL_DOCS = {
 export default function Footer() {
   const [activeLegalTab, setActiveLegalTab] = useState(null);
   const [copiedItem, setCopiedItem] = useState(null);
-  const [callbackInput, setCallbackInput] = useState('');
-  const [callbackStatus, setCallbackStatus] = useState('idle');
 
   // Modal keyboard listener & body scroll lock
   useEffect(() => {
@@ -166,120 +164,11 @@ export default function Footer() {
     }
   };
 
-  const handleCallbackSubmit = (e) => {
-    e.preventDefault();
-    if (!callbackInput.trim()) return;
-    setCallbackStatus('loading');
-    setTimeout(() => {
-      setCallbackStatus('success');
-    }, 700);
-  };
-
   const activeDoc = activeLegalTab ? LEGAL_DOCS[activeLegalTab] : null;
 
   return (
     <>
       <footer className="site-footer">
-        
-        {/* ── TOP PRE-FOOTER BANNER / QUICK CALL-TO-ACTION ── */}
-        <div className="footer-top-banner">
-          <div className="w">
-            <div className="footer-top-grid">
-              
-              {/* Left Column: Heading & Value Prop */}
-              <div style={{ maxWidth: '600px' }}>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                  <span className="footer-badge" style={{ background: 'rgba(245, 158, 11, 0.15)', borderColor: 'rgba(245, 158, 11, 0.3)', color: 'var(--gold)' }}>
-                    <Award size={14} /> 40% Partner Commission
-                  </span>
-                  <span className="footer-badge" style={{ background: 'rgba(16, 185, 129, 0.15)', borderColor: 'rgba(16, 185, 129, 0.3)', color: '#34d399' }}>
-                    <IndianRupee size={14} /> 100% Refundable Deposit
-                  </span>
-                  <span className="footer-badge">
-                    <span className="pulse-dot" /> Live Territory Booking
-                  </span>
-                </div>
-
-                <h3 style={{ fontSize: 'clamp(1.4rem, 3vw, 1.85rem)', fontWeight: '800', color: '#fff', margin: '0 0 8px', letterSpacing: '-0.5px', fontFamily: "'Outfit', sans-serif" }}>
-                  Empower Your Constituency & Campaign Operations
-                </h3>
-                <p style={{ color: 'rgba(255, 255, 255, 0.72)', fontSize: '0.96rem', margin: 0, lineHeight: '1.6' }}>
-                  Join India's premier election technology ecosystem as a verified territory affiliate or onboard your election war-room today.
-                </p>
-              </div>
-
-              {/* Right Column: Instant Callback / Updates Form */}
-              <div style={{ width: '100%', maxWidth: '420px' }}>
-                <div style={{ background: 'rgba(2, 6, 23, 0.65)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '18px', padding: '18px 20px', boxShadow: '0 12px 28px rgba(0,0,0,0.35)' }}>
-                  
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      ⚡ Request Instant Callback
-                    </span>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--gold)', fontWeight: '600' }}>
-                      Within 30 Mins
-                    </span>
-                  </div>
-
-                  {callbackStatus === 'success' ? (
-                    <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', borderRadius: '12px', padding: '12px 14px', color: '#34d399', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <CheckCircle size={20} style={{ flexShrink: 0 }} />
-                      <div>
-                        <strong>Request Received!</strong>
-                        <p style={{ margin: '2px 0 0', fontSize: '0.82rem', color: 'rgba(255,255,255,0.85)' }}>
-                          Our support team will call you shortly on {callbackInput}.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleCallbackSubmit} style={{ display: 'flex', gap: '8px' }}>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Mobile number or email..."
-                        value={callbackInput}
-                        onChange={(e) => setCallbackInput(e.target.value)}
-                        style={{
-                          flex: 1,
-                          background: 'rgba(255, 255, 255, 0.07)',
-                          border: '1px solid rgba(255, 255, 255, 0.15)',
-                          borderRadius: '10px',
-                          padding: '10px 14px',
-                          color: '#fff',
-                          fontSize: '0.92rem',
-                          outline: 'none'
-                        }}
-                      />
-                      <button
-                        type="submit"
-                        disabled={callbackStatus === 'loading'}
-                        className="btn"
-                        style={{
-                          padding: '10px 18px',
-                          fontSize: '0.9rem',
-                          borderRadius: '10px',
-                          whiteSpace: 'nowrap',
-                          boxShadow: 'none'
-                        }}
-                      >
-                        {callbackStatus === 'loading' ? 'Sending...' : 'Call Me'}
-                      </button>
-                    </form>
-                  )}
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>
-                    <span>🛡️ 100% Confidential & Encrypted</span>
-                    <Link href="/contact" style={{ color: 'var(--gold)', textDecoration: 'none', fontWeight: '600' }}>
-                      Full Inquiry Form →
-                    </Link>
-                  </div>
-
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
 
 
         {/* ── MAIN 4-COLUMN FOOTER CONTENT ── */}
