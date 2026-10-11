@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  ShieldCheck, ArrowRight, X, CheckCircle,
+  ShieldCheck, X, CheckCircle,
   FileText, Lock, Award, ArrowUp,
-  Copy, Check, Printer, ChevronRight, Building
+  Copy, Check, Printer, ChevronRight
 } from 'lucide-react';
 
 const LEGAL_DOCS = {
@@ -13,11 +13,11 @@ const LEGAL_DOCS = {
     title: 'Privacy & Voter Data Security Policy',
     tag: 'Data Protection & Cryptography',
     effectiveDate: 'Updated for 2026 Campaign Cycle',
-    overview: 'Poll Craft Analytics Private Limited places highest priority on political data privacy, zero third-party disclosure, and role-based cryptographic voter record protection under the Information Technology Act.',
+    overview: 'Poll Craft Analytics places highest priority on political data privacy, zero third-party disclosure, and role-based cryptographic voter record protection under the Information Technology Act.',
     points: [
       {
         heading: 'Bank-Grade 256-Bit SSL Encryption',
-        desc: 'All voter surveys, karyakarta GPS coordinates, booth reports, and campaign metrics are encrypted in transit and at rest using bank-grade 256-bit SSL protocols and strict Firestore server security rules.'
+        desc: 'All voter surveys, field team coordinates, activity reports, and management metrics are encrypted in transit and at rest using bank-grade 256-bit SSL protocols and strict Firestore server security rules.'
       },
       {
         heading: 'Zero Third-Party Data Monetization',
@@ -55,7 +55,7 @@ const LEGAL_DOCS = {
       },
       {
         heading: 'Proprietary Intellectual Property',
-        desc: 'All platform code, analytical models, strategy frameworks, predictive algorithms, and DRM video training resources remain the exclusive intellectual property of Poll Craft Analytics Private Limited.'
+        desc: 'All platform code, analytical models, strategy frameworks, predictive algorithms, and DRM video training resources remain the exclusive intellectual property of Poll Craft Analytics.'
       }
     ],
     highlight: 'Platform access may be suspended immediately upon detection of malicious data injection, unauthorized credential resale, or unauthorized scraping.'
@@ -175,57 +175,14 @@ export default function Footer() {
         <div className="w">
           <div className="footer-main-grid">
             
-            {/* COLUMN 1: BRAND & ENTERPRISE PROFILE (Spans more space) */}
+            {/* COLUMN 1: BRAND LOGO */}
             <div>
-              {/* Brand Logo */}
-              <Link href="/" className="logo" style={{ fontSize: '1.55rem', marginBottom: '14px', display: 'inline-flex' }}>
+              <Link href="/" className="logo" style={{ fontSize: '1.65rem', marginBottom: '12px', display: 'inline-flex' }}>
                 Poll Craft Analytics<i style={{ color: 'var(--gold)' }}>.</i>
               </Link>
-              
-              <div style={{ color: '#fff', fontSize: '0.88rem', fontWeight: '700', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Building size={15} style={{ color: 'var(--gold)' }} />
-                <span>Poll Craft Analytics Private Limited</span>
-              </div>
-
-              <p style={{ color: 'rgba(255, 255, 255, 0.72)', fontSize: '0.92rem', lineHeight: '1.7', marginBottom: '20px', maxWidth: '380px' }}>
-                India's premier election operations & voter intelligence platform. Empowering candidates, representatives, and karyakarta teams with field coordination, real-time analytics, and guaranteed territory affiliate partnerships.
+              <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.92rem', lineHeight: '1.65', margin: 0, maxWidth: '340px' }}>
+                Bringing Teams, Activities, and Ground-Level Information Together.
               </p>
-
-              {/* Trust & Compliance Pills */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '22px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)' }}>
-                  <ShieldCheck size={16} style={{ color: '#10b981', flexShrink: 0 }} />
-                  <span>256-Bit SSL Encrypted & Role-Based Access</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)' }}>
-                  <Lock size={16} style={{ color: 'var(--gold)', flexShrink: 0 }} />
-                  <span>Zero Third-Party Data Sharing Guarantee</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem', color: 'rgba(255, 255, 255, 0.85)' }}>
-                  <span className="pulse-dot" />
-                  <span>99.9% High-Availability Cloud Infrastructure</span>
-                </div>
-              </div>
-
-              {/* Contact Helpdesk Link */}
-              <div style={{ marginTop: '16px' }}>
-                <Link
-                  href="/contact"
-                  className="btn s o"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 18px',
-                    color: '#fff',
-                    borderColor: 'rgba(255, 255, 255, 0.25)',
-                    fontSize: '0.86rem'
-                  }}
-                >
-                  <ArrowRight size={14} /> Contact & Support Desk
-                </Link>
-              </div>
-
             </div>
 
 
@@ -242,7 +199,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link href="/products" className="footer-nav-link">
-                    <ChevronRight size={14} /> Team & Karyakarta Coordination
+                    <ChevronRight size={14} /> Team Management & Coordination
                   </Link>
                 </li>
                 <li>
@@ -370,7 +327,7 @@ export default function Footer() {
             {/* Copyright & Legal Entity */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <div style={{ color: 'rgba(255, 255, 255, 0.85)', fontWeight: '600', fontSize: '0.9rem' }}>
-                © {new Date().getFullYear()} Poll Craft Analytics Private Limited. All rights reserved.
+                © {new Date().getFullYear()} Poll Craft Analytics. All rights reserved.
               </div>
               <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.45)' }}>
                 CIN / Reg. Enterprise • Compliant with Indian Information Technology & Election Laws
@@ -490,7 +447,7 @@ export default function Footer() {
                   {activeDoc.title}
                 </h3>
                 <span style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)' }}>
-                  {activeDoc.effectiveDate} • Poll Craft Analytics Private Limited
+                  {activeDoc.effectiveDate} • Poll Craft Analytics
                 </span>
               </div>
 
