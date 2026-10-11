@@ -305,14 +305,9 @@ export default function Footer() {
           {/* ── BOTTOM BAR WITH COPYRIGHT, COMPLIANCE & BACK TO TOP ── */}
           <div className="footer-bottom-bar">
             
-            {/* Copyright & Legal Entity */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div style={{ color: 'rgba(255, 255, 255, 0.85)', fontWeight: '600', fontSize: '0.9rem' }}>
-                © {new Date().getFullYear()} Poll Craft Analytics. All rights reserved.
-              </div>
-              <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.45)' }}>
-                CIN / Reg. Enterprise • Compliant with Indian Information Technology & Election Laws
-              </div>
+            {/* Copyright */}
+            <div style={{ color: 'rgba(255, 255, 255, 0.85)', fontWeight: '600', fontSize: '0.9rem' }}>
+              © {new Date().getFullYear()} Poll Craft Analytics. All rights reserved.
             </div>
 
             {/* Quick Legal Policy Links */}
