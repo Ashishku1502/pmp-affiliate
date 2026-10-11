@@ -88,8 +88,8 @@ footer.site-footer{background:#020617;color:#94a3b8;text-align:left;padding:0;bo
 .site-footer a{text-decoration:none}
 .footer-top-banner{background:linear-gradient(135deg,rgba(15,23,42,0.95) 0%,rgba(30,41,59,0.85) 100%);border-bottom:1px solid rgba(255,255,255,0.08);padding:36px 0;position:relative}
 .footer-top-grid{display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap}
-.footer-main-grid{display:grid;grid-template-columns:1.8fr 1.1fr 1.1fr 1.4fr;gap:40px;padding:60px 0 44px}
-@media(max-width:1100px){.footer-main-grid{grid-template-columns:repeat(2,1fr);gap:36px}}
+.footer-main-grid{display:grid;grid-template-columns:1.6fr 1.2fr 1.2fr;gap:48px;padding:60px 0 44px}
+@media(max-width:960px){.footer-main-grid{grid-template-columns:repeat(2,1fr);gap:36px}}
 @media(max-width:680px){.footer-main-grid{grid-template-columns:1fr !important;gap:32px}}
 .footer-col-title{color:#fff;font-size:0.95rem;font-family:'Outfit',sans-serif;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px}
 .footer-link-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}

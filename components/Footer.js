@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  ShieldCheck, Mail, Phone, MapPin, ArrowRight, X, CheckCircle,
-  FileText, Lock, Award, ArrowUp, ExternalLink,
-  MessageCircle, Clock, Copy, Check, Printer, ChevronRight, Building
+  ShieldCheck, ArrowRight, X, CheckCircle,
+  FileText, Lock, Award, ArrowUp,
+  Copy, Check, Printer, ChevronRight, Building
 } from 'lucide-react';
 
 const LEGAL_DOCS = {
@@ -107,7 +107,7 @@ const LEGAL_DOCS = {
       },
       {
         heading: 'Dedicated Escalation Desk',
-        desc: 'Any refund questions receive immediate executive handling via priority email (support@pollcraftanalytics.com) or direct telephone helpline.'
+        desc: 'Any refund questions receive immediate executive handling via priority inquiry or direct assistance through our verified portal.'
       }
     ],
     highlight: 'Your security deposit is never treated as a purchase fee. It remains your refundable collateral at all times.'
@@ -207,41 +207,22 @@ export default function Footer() {
                 </div>
               </div>
 
-              {/* Social / Channel Quick Connect */}
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <a
-                  href="https://wa.me/919876543210?text=Hello%20Poll%20Craft%20Analytics%20Team%2C%20I%20am%20interested%20in%20the%20platform"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="footer-social-btn"
-                  title="Chat on WhatsApp"
-                  aria-label="WhatsApp Support"
-                >
-                  <MessageCircle size={18} />
-                </a>
-                <a
-                  href="tel:+919876543210"
-                  className="footer-social-btn"
-                  title="Direct Phone Call"
-                  aria-label="Call Support"
-                >
-                  <Phone size={18} />
-                </a>
-                <a
-                  href="mailto:support@pollcraftanalytics.com"
-                  className="footer-social-btn"
-                  title="Email Support"
-                  aria-label="Email Support"
-                >
-                  <Mail size={18} />
-                </a>
+              {/* Contact Helpdesk Link */}
+              <div style={{ marginTop: '16px' }}>
                 <Link
                   href="/contact"
-                  className="footer-social-btn"
-                  title="Contact Helpdesk Page"
-                  aria-label="Contact Page"
+                  className="btn s o"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 18px',
+                    color: '#fff',
+                    borderColor: 'rgba(255, 255, 255, 0.25)',
+                    fontSize: '0.86rem'
+                  }}
                 >
-                  <MapPin size={18} />
+                  <ArrowRight size={14} /> Contact & Support Desk
                 </Link>
               </div>
 
@@ -378,122 +359,7 @@ export default function Footer() {
             </div>
 
 
-            {/* COLUMN 4: DIRECT CONTACT & REGISTERED OFFICE */}
-            <div>
-              <h4 className="footer-col-title">
-                <Phone size={16} style={{ color: '#10b981' }} />
-                Direct Contact Desk
-              </h4>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                
-                {/* Clickable Phone with Copy helper */}
-                <div className="footer-contact-row" style={{ justifyContent: 'space-between' }}>
-                  <a
-                    href="tel:+919876543210"
-                    style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', flex: 1, textDecoration: 'none' }}
-                  >
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.15)', color: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Phone size={16} />
-                    </div>
-                    <div>
-                      <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>
-                        Call / Hotline Desk
-                      </span>
-                      <strong style={{ fontSize: '0.98rem', color: '#fff' }}>+91 98765 43210</strong>
-                    </div>
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard('+919876543210', 'phone')}
-                    title="Copy phone number"
-                    style={{ background: 'transparent', border: 0, color: copiedItem === 'phone' ? '#10b981' : 'rgba(255,255,255,0.4)', cursor: 'pointer', padding: '6px' }}
-                    aria-label="Copy phone"
-                  >
-                    {copiedItem === 'phone' ? <Check size={16} /> : <Copy size={16} />}
-                  </button>
-                </div>
-
-                {/* Direct WhatsApp Clickable */}
-                <a
-                  href="https://wa.me/919876543210?text=Hello%20Poll%20Craft%20Analytics%20Team%2C%20I%20am%20interested%20in%20the%20platform"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="footer-contact-row"
-                >
-                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <MessageCircle size={16} />
-                  </div>
-                  <div>
-                    <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>
-                      Instant WhatsApp Chat
-                    </span>
-                    <strong style={{ fontSize: '0.94rem', color: '#34d399', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      +91 98765 43210 <ExternalLink size={12} />
-                    </strong>
-                  </div>
-                </a>
-
-                {/* Clickable Email with Copy helper */}
-                <div className="footer-contact-row" style={{ justifyContent: 'space-between' }}>
-                  <a
-                    href="mailto:support@pollcraftanalytics.com"
-                    style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff', flex: 1, textDecoration: 'none' }}
-                  >
-                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Mail size={16} />
-                    </div>
-                    <div style={{ overflow: 'hidden' }}>
-                      <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>
-                        Official Email
-                      </span>
-                      <strong style={{ fontSize: '0.9rem', color: '#fff', wordBreak: 'break-all' }}>
-                        support@pollcraftanalytics.com
-                      </strong>
-                    </div>
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard('support@pollcraftanalytics.com', 'email')}
-                    title="Copy email address"
-                    style={{ background: 'transparent', border: 0, color: copiedItem === 'email' ? '#10b981' : 'rgba(255,255,255,0.4)', cursor: 'pointer', padding: '6px' }}
-                    aria-label="Copy email"
-                  >
-                    {copiedItem === 'email' ? <Check size={16} /> : <Copy size={16} />}
-                  </button>
-                </div>
-
-                {/* Corporate Address with Google Maps link */}
-                <a
-                  href="https://maps.google.com/?q=Cyber+Technology+Hub+Sector+62+Noida+Uttar+Pradesh+201309"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="footer-contact-row"
-                >
-                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
-                    <MapPin size={16} />
-                  </div>
-                  <div>
-                    <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>
-                      Registered Office (India)
-                    </span>
-                    <span style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.85)', lineHeight: '1.5', display: 'block' }}>
-                      Cyber Technology Hub, Sector 62, Noida, Uttar Pradesh 201309
-                    </span>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--gold)', display: 'inline-flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
-                      Open in Maps <ExternalLink size={11} />
-                    </span>
-                  </div>
-                </a>
-
-                {/* Timings */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'rgba(255,255,255,0.6)', padding: '4px 6px' }}>
-                  <Clock size={14} style={{ color: 'var(--gold)', flexShrink: 0 }} />
-                  <span>Mon – Sat: 9:00 AM – 7:00 PM IST (Elections: 24/7)</span>
-                </div>
-
-              </div>
-            </div>
 
           </div>
 
