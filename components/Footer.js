@@ -175,18 +175,7 @@ export default function Footer() {
         <div className="w">
           <div className="footer-main-grid">
             
-            {/* COLUMN 1: BRAND LOGO */}
-            <div>
-              <Link href="/" className="logo" style={{ fontSize: '1.65rem', marginBottom: '12px', display: 'inline-flex' }}>
-                Poll Craft Analytics<i style={{ color: 'var(--gold)' }}>.</i>
-              </Link>
-              <p style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.92rem', lineHeight: '1.65', margin: 0, maxWidth: '340px' }}>
-                Bringing Teams, Activities, and Ground-Level Information Together.
-              </p>
-            </div>
-
-
-            {/* COLUMN 2: DIGITAL PRODUCTS & SOFTWARE MODULES */}
+            {/* COLUMN 1: PLATFORM MODULES */}
             <div>
               <h4 className="footer-col-title">
                 Platform Modules
@@ -223,17 +212,22 @@ export default function Footer() {
                   </Link>
                 </li>
               </ul>
+            </div>
 
-              <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                <h5 style={{ color: '#fff', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
-                  Quick Navigation
-                </h5>
-                <ul className="footer-link-list">
-                  <li><Link href="/" className="footer-nav-link"><ChevronRight size={14} /> Home Page</Link></li>
-                  <li><Link href="/about" className="footer-nav-link"><ChevronRight size={14} /> About Company</Link></li>
-                  <li><Link href="/contact" className="footer-nav-link"><ChevronRight size={14} /> Contact & Support</Link></li>
-                </ul>
-              </div>
+
+            {/* COLUMN 2: QUICK NAVIGATION */}
+            <div>
+              <h4 className="footer-col-title">
+                Quick Navigation
+              </h4>
+              <ul className="footer-link-list">
+                <li><Link href="/" className="footer-nav-link"><ChevronRight size={14} /> Home Page</Link></li>
+                <li><Link href="/about" className="footer-nav-link"><ChevronRight size={14} /> About Company</Link></li>
+                <li><Link href="/products" className="footer-nav-link"><ChevronRight size={14} /> Explore Products</Link></li>
+                <li><Link href="/seats" className="footer-nav-link"><ChevronRight size={14} /> Territory Seats</Link></li>
+                <li><Link href="/contact" className="footer-nav-link"><ChevronRight size={14} /> Contact & Support</Link></li>
+                <li><Link href="/login" className="footer-nav-link"><ChevronRight size={14} /> Dashboard Login</Link></li>
+              </ul>
             </div>
 
 
@@ -241,7 +235,7 @@ export default function Footer() {
             <div>
               <h4 className="footer-col-title">
                 <Award size={16} style={{ color: 'var(--blue)' }} />
-                Partner Program
+                Partner & Legal
               </h4>
               <ul className="footer-link-list">
                 <li>
@@ -255,64 +249,51 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="footer-nav-link">
-                    <ChevronRight size={14} /> Affiliate Partner Login
-                  </Link>
-                </li>
-                <li>
                   <Link href="/dashboard" className="footer-nav-link">
                     <ChevronRight size={14} /> Partner Earnings Dashboard
                   </Link>
                 </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setActiveLegalTab('privacy')}
+                    className="footer-nav-link"
+                    aria-label="Open Privacy Policy"
+                  >
+                    <ChevronRight size={14} /> Privacy & Data Policy
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setActiveLegalTab('terms')}
+                    className="footer-nav-link"
+                    aria-label="Open Terms and Conditions"
+                  >
+                    <ChevronRight size={14} /> Terms & Conditions
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setActiveLegalTab('agreement')}
+                    className="footer-nav-link"
+                    aria-label="Open Affiliate Partner Agreement"
+                  >
+                    <ChevronRight size={14} /> Partner Agreement (40%)
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setActiveLegalTab('refund')}
+                    className="footer-nav-link"
+                    aria-label="Open Refund Policy"
+                  >
+                    <ChevronRight size={14} /> Refund & Deposit Policy
+                  </button>
+                </li>
               </ul>
-
-              <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                <h5 style={{ color: '#fff', fontSize: '0.85rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' }}>
-                  Legal & Governance
-                </h5>
-                <ul className="footer-link-list">
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => setActiveLegalTab('privacy')}
-                      className="footer-nav-link"
-                      aria-label="Open Privacy Policy"
-                    >
-                      <ChevronRight size={14} /> Privacy & Data Policy
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => setActiveLegalTab('terms')}
-                      className="footer-nav-link"
-                      aria-label="Open Terms and Conditions"
-                    >
-                      <ChevronRight size={14} /> Terms & Conditions
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => setActiveLegalTab('agreement')}
-                      className="footer-nav-link"
-                      aria-label="Open Affiliate Partner Agreement"
-                    >
-                      <ChevronRight size={14} /> Partner Agreement (40%)
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      type="button"
-                      onClick={() => setActiveLegalTab('refund')}
-                      className="footer-nav-link"
-                      aria-label="Open Refund Policy"
-                    >
-                      <ChevronRight size={14} /> Refund & Deposit Policy
-                    </button>
-                  </li>
-                </ul>
-              </div>
             </div>
 
 
