@@ -7,7 +7,7 @@ import {
   ArrowRight, ArrowLeft, ShieldCheck, CreditCard, LayoutDashboard, 
   User, Phone, FileText, MessageSquare, MapPin, IndianRupee, Award, 
   CheckCircle, Lock, Zap, RefreshCw, AlertCircle, Copy, Layers, Landmark, 
-  Building, Check, ChevronRight
+  Building, Check, ChevronRight, Mail, Briefcase, Sparkles, CheckCircle2, Shield, Info
 } from 'lucide-react';
 
 const T = ['Details', 'Verify', 'Territory', 'Deposit', 'Active'];
@@ -33,6 +33,9 @@ export default function Join() {
     n: '', 
     m: '', 
     k: '', 
+    email: '',
+    kycType: 'Aadhaar',
+    profession: 'Political / Social Worker',
     md: 'Single', 
     state: defaultState,
     city: defaultCity,
@@ -152,9 +155,28 @@ export default function Join() {
   const next = async () => {
     setErr('');
     if (step === 0) {
-      if (!f.n.trim()) { setErr('Kripya apna poora naam likhein.'); return; }
-      if (f.m.trim().length < 10) { setErr('Kripya 10 ank ka valid mobile number daalein.'); return; }
-      if (!f.k.trim()) { setErr('Kripya Aadhaar ya PAN number (KYC) bhariye.'); return; }
+      if (!f.n.trim() || f.n.trim().length < 2) { 
+        setErr('Kripya apna poora naam darj karein (Aadhaar / Bank record ke anusaar).'); 
+        return; 
+      }
+      const rawMobile = f.m.replace(/\D/g, '');
+      if (rawMobile.length !== 10) { 
+        setErr('Kripya 10 ank ka valid mobile number darj karein.'); 
+        return; 
+      }
+      const rawKyc = f.k.replace(/\s/g, '');
+      if (!rawKyc) { 
+        setErr(`Kripya valid ${f.kycType || 'Aadhaar ya PAN'} number darj karein.`); 
+        return; 
+      }
+      if (f.kycType === 'Aadhaar' && rawKyc.length !== 12) {
+        setErr('Aadhaar number theek 12 ank ka hona chahiye.');
+        return;
+      }
+      if (f.kycType === 'PAN' && rawKyc.length !== 10) {
+        setErr('PAN number theek 10 akshar ka hona chahiye (Jaise: ABCDE1234F).');
+        return;
+      }
       sendOtp();
       setStep(1);
       return;
@@ -350,61 +372,314 @@ export default function Join() {
 
           {/* STEP 0: Details */}
           {s === 0 && <>
-            <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-              <div style={{ display: 'inline-flex', padding: '16px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '50%', color: 'var(--blue)', marginBottom: '16px' }}>
-                <User size={28} />
+            {/* Header with Title and Trust Highlights */}
+            <div style={{ marginBottom: '28px', textAlign: 'center' }}>
+              <div style={{ display: 'inline-flex', padding: '16px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '50%', color: 'var(--blue)', marginBottom: '14px' }}>
+                <User size={30} />
               </div>
-              <h2 style={{ fontSize: '1.6rem', margin: '0 0 8px', color: 'var(--navy)' }}>Personal Details</h2>
-              <p style={{ color: 'var(--muted)', fontSize: '0.95rem', margin: 0 }}>Aapki jankari poori tarah surakshit hai.</p>
-            </div>
-
-            <div style={{ marginBottom: '24px', background: '#f8fafc', padding: '14px 18px', borderRadius: '12px', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <MapPin size={16} style={{ color: 'var(--gold)' }} />
-                <span style={{ fontSize: '0.88rem', color: 'var(--navy)' }}>
-                  Assigned Territory: <strong>{f.ar}</strong>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+                <span className="tag" style={{ background: 'rgba(59, 130, 246, 0.1)', color: 'var(--blue)', fontWeight: '700', fontSize: '0.8rem', padding: '4px 12px' }}>
+                  <ShieldCheck size={13} className="nav-icon" /> Step 1 of 4 • Partner Identity
                 </span>
               </div>
-              <button
-                type="button"
-                id="step0-open-territory-link"
-                onClick={() => { setErr(''); setStep(2); }}
-                style={{ background: 'none', border: 'none', color: 'var(--blue)', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline' }}
-              >
-                Area & Block Badlein →
-              </button>
-            </div>
-            
-            <div style={{ marginBottom: '24px' }}>
-              <label htmlFor="join-name" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
-                <User size={16} className="nav-icon" style={{ color: 'var(--blue)' }} /> Poora naam
-              </label>
-              <input id="join-name" placeholder="Jaise: Rahul Kumar" value={f.n} onChange={set('n')} style={inputStyle} />
-            </div>
+              <h2 style={{ fontSize: '1.75rem', fontWeight: '900', margin: '0 0 8px', color: 'var(--navy)', letterSpacing: '-0.5px' }}>
+                Personal Details (व्यक्तिगत जानकारी)
+              </h2>
+              <p style={{ color: 'var(--muted)', fontSize: '0.96rem', margin: 0, maxWidth: '480px', margin: '0 auto' }}>
+                Poll Craft Analytics network me judne ke liye apni authentic details darj karein.
+              </p>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label htmlFor="join-mobile" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
-                <Phone size={16} className="nav-icon" style={{ color: 'var(--blue)' }} /> Mobile number
-              </label>
-              <div style={{ display: 'flex', alignItems: 'stretch', border: '1px solid var(--line)', borderRadius: '12px', overflow: 'hidden', background: '#f8fafc' }}>
-                <div style={{ padding: '0 16px', background: 'var(--pale)', color: 'var(--navy)', fontWeight: '800', borderRight: '1px solid var(--line)', display: 'flex', alignItems: 'center' }}>+91</div>
-                <input id="join-mobile" type="tel" inputMode="numeric" maxLength={10} placeholder="9876543210" value={f.m} onChange={set('m')} style={{ padding: '16px', flex: 1, border: 'none', borderRadius: 0, outline: 'none', background: 'transparent', fontSize: '1rem', color: 'var(--navy)' }} />
+              {/* 3 Micro Trust Badges */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '16px' }}>
+                <span style={{ fontSize: '0.78rem', background: '#f8fafc', color: 'var(--navy)', border: '1px solid var(--line)', padding: '4px 10px', borderRadius: '8px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <Lock size={12} style={{ color: '#10b981' }} /> 256-bit Encrypted
+                </span>
+                <span style={{ fontSize: '0.78rem', background: '#f8fafc', color: 'var(--navy)', border: '1px solid var(--line)', padding: '4px 10px', borderRadius: '8px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <Zap size={12} style={{ color: 'var(--gold)' }} /> Instant OTP Verification
+                </span>
+                <span style={{ fontSize: '0.78rem', background: '#f8fafc', color: 'var(--navy)', border: '1px solid var(--line)', padding: '4px 10px', borderRadius: '8px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <IndianRupee size={12} style={{ color: 'var(--blue)' }} /> Direct Bank Payouts
+                </span>
               </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--muted)', margin: '8px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} /> Is par OTP bheja jayega.</p>
             </div>
 
-            <div style={{ marginBottom: '40px' }}>
-              <label htmlFor="join-kyc" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
-                <FileText size={16} className="nav-icon" style={{ color: 'var(--blue)' }} /> Aadhaar / PAN (KYC)
+            {/* Assigned Territory Interactive Card */}
+            <div style={{ marginBottom: '26px', background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)', padding: '18px 20px', borderRadius: '16px', border: '1px solid rgba(245, 158, 11, 0.35)', boxShadow: '0 4px 14px rgba(245, 158, 11, 0.08)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <MapPin size={18} style={{ color: 'var(--gold)', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.85rem', fontWeight: '800', color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Assigned Working Territory (कार्यक्षेत्र)
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  id="step0-open-territory-link"
+                  onClick={() => { setErr(''); setStep(2); }}
+                  style={{ background: '#fff', border: '1px solid rgba(245, 158, 11, 0.4)', color: '#b45309', padding: '5px 12px', borderRadius: '8px', fontWeight: '800', fontSize: '0.82rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px', boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}
+                >
+                  <MapPin size={12} /> Area / Block Badlein →
+                </button>
+              </div>
+
+              <div style={{ fontSize: '1.15rem', fontWeight: '900', color: 'var(--navy)', marginBottom: '10px', lineHeight: '1.4' }}>
+                {f.ar}
+              </div>
+
+              {/* Territory Sub-Badges */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                <span className="tag" style={{ background: '#eff6ff', color: 'var(--blue)', fontSize: '0.78rem', padding: '3px 8px' }}>
+                  State: {selectedState}
+                </span>
+                <span className="tag" style={{ background: '#fff', color: 'var(--navy)', border: '1px solid var(--line)', fontSize: '0.78rem', padding: '3px 8px' }}>
+                  City: {selectedCity}
+                </span>
+                {selectedBlock && (
+                  <span className="tag" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#047857', fontSize: '0.78rem', padding: '3px 8px' }}>
+                    Block: {isCustomBlock ? (customBlock || 'Custom') : selectedBlock}
+                  </span>
+                )}
+                {selectedArea && (
+                  <span className="tag" style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#b45309', fontSize: '0.78rem', padding: '3px 8px' }}>
+                    Area: {selectedArea}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Field 1: Poora Naam */}
+            <div style={{ marginBottom: '22px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label htmlFor="join-name" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', color: 'var(--navy)', margin: 0 }}>
+                  <User size={16} style={{ color: 'var(--blue)' }} /> 1. Poora Naam (Full Name) *
+                </label>
+                {f.n.trim().length >= 3 && (
+                  <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: '700', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <CheckCircle2 size={13} /> Naam darj hai
+                  </span>
+                )}
+              </div>
+              <input 
+                id="join-name" 
+                placeholder="Jaise: Rahul Sharma (Aadhaar / Bank record ke anusaar)" 
+                value={f.n} 
+                onChange={set('n')} 
+                style={inputStyle} 
+              />
+              <span style={{ fontSize: '0.78rem', color: 'var(--muted)', display: 'block', marginTop: '6px' }}>
+                Bank account me jo naam hai wahi likhein taaki payout me dikkat na ho.
+              </span>
+            </div>
+
+            {/* Field 2: Mobile Number */}
+            <div style={{ marginBottom: '22px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label htmlFor="join-mobile" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', color: 'var(--navy)', margin: 0 }}>
+                  <Phone size={16} style={{ color: 'var(--blue)' }} /> 2. Mobile Number (OTP Verification) *
+                </label>
+                <span style={{ fontSize: '0.78rem', fontWeight: '700', color: f.m.length === 10 ? '#10b981' : 'var(--muted)' }}>
+                  {f.m.length === 10 ? '✓ 10 Digits Complete' : `${f.m.length} / 10 Digits`}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'stretch', border: '1px solid var(--line)', borderRadius: '12px', overflow: 'hidden', background: '#f8fafc', transition: 'border-color 0.2s ease' }}>
+                <div style={{ padding: '0 16px', background: 'var(--pale)', color: 'var(--navy)', fontWeight: '800', borderRight: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>🇮🇳</span> +91
+                </div>
+                <input 
+                  id="join-mobile" 
+                  type="tel" 
+                  inputMode="numeric" 
+                  maxLength={10} 
+                  placeholder="9876543210" 
+                  value={f.m} 
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    setErr('');
+                    setF(prev => ({ ...prev, m: val }));
+                  }} 
+                  style={{ padding: '16px', flex: 1, border: 'none', borderRadius: 0, outline: 'none', background: 'transparent', fontSize: '1.05rem', color: 'var(--navy)', fontWeight: '600' }} 
+                />
+              </div>
+              <p style={{ fontSize: '0.78rem', color: 'var(--muted)', margin: '6px 0 0', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <ShieldCheck size={13} style={{ color: '#10b981' }} /> Is number par SMS se 4-ank ka verification OTP bheja jayega.
+              </p>
+            </div>
+
+            {/* Field 3: Email Address (Optional) */}
+            <div style={{ marginBottom: '22px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label htmlFor="join-email" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', color: 'var(--navy)', margin: 0 }}>
+                  <Mail size={16} style={{ color: 'var(--blue)' }} /> 3. Email Address (वैकल्पिक / Optional)
+                </label>
+                <span style={{ fontSize: '0.78rem', color: 'var(--muted)', fontWeight: '600' }}>Optional</span>
+              </div>
+              <input 
+                id="join-email" 
+                type="email" 
+                placeholder="Jaise: rahul.sharma@example.com" 
+                value={f.email || ''} 
+                onChange={set('email')} 
+                style={inputStyle} 
+              />
+              <span style={{ fontSize: '0.78rem', color: 'var(--muted)', display: 'block', marginTop: '6px' }}>
+                Monthly commission statement aur seat booking confirmation receipts ke liye.
+              </span>
+            </div>
+
+            {/* Field 4: KYC Verification (Aadhaar / PAN Selector & Input) */}
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                <label htmlFor="join-kyc" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', color: 'var(--navy)', margin: 0 }}>
+                  <FileText size={16} style={{ color: 'var(--blue)' }} /> 4. Identity & Tax Verification (KYC) *
+                </label>
+                <span style={{ fontSize: '0.78rem', fontWeight: '700', color: (f.kycType === 'Aadhaar' ? f.k.replace(/\s/g,'').length === 12 : f.k.length === 10) ? '#10b981' : 'var(--muted)' }}>
+                  {f.kycType === 'Aadhaar' ? `${f.k.replace(/\s/g,'').length} / 12 Ank` : `${f.k.length} / 10 Chars`}
+                </span>
+              </div>
+
+              {/* KYC Document Toggle */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                <button
+                  type="button"
+                  id="kyc-type-aadhaar-btn"
+                  onClick={() => {
+                    setErr('');
+                    setF(prev => ({ ...prev, kycType: 'Aadhaar', k: '' }));
+                  }}
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    border: f.kycType === 'Aadhaar' ? '2px solid var(--blue)' : '1px solid var(--line)',
+                    background: f.kycType === 'Aadhaar' ? '#eff6ff' : '#f8fafc',
+                    color: f.kycType === 'Aadhaar' ? 'var(--blue)' : 'var(--muted)',
+                    fontWeight: '800',
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <FileText size={16} /> 🪪 Aadhaar Card (12 अंक)
+                </button>
+                <button
+                  type="button"
+                  id="kyc-type-pan-btn"
+                  onClick={() => {
+                    setErr('');
+                    setF(prev => ({ ...prev, kycType: 'PAN', k: '' }));
+                  }}
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    border: f.kycType === 'PAN' ? '2px solid var(--gold)' : '1px solid var(--line)',
+                    background: f.kycType === 'PAN' ? '#fffbeb' : '#f8fafc',
+                    color: f.kycType === 'PAN' ? '#b45309' : 'var(--muted)',
+                    fontWeight: '800',
+                    fontSize: '0.9rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <CreditCard size={16} /> 💳 PAN Card (10 Chars)
+                </button>
+              </div>
+
+              {/* KYC Input */}
+              <input 
+                id="join-kyc" 
+                placeholder={f.kycType === 'Aadhaar' ? '1234 5678 9012 (12-digit Aadhaar Number)' : 'ABCDE1234F (10-character PAN Number)'} 
+                maxLength={f.kycType === 'Aadhaar' ? 14 : 10}
+                value={f.k} 
+                onChange={(e) => {
+                  setErr('');
+                  const val = f.kycType === 'PAN' ? e.target.value.toUpperCase() : e.target.value;
+                  setF(prev => ({ ...prev, k: val }));
+                }} 
+                style={{ ...inputStyle, fontFamily: 'monospace', fontSize: '1.05rem', letterSpacing: '1px', fontWeight: '700' }} 
+              />
+              <span style={{ fontSize: '0.78rem', color: 'var(--muted)', display: 'block', marginTop: '6px' }}>
+                {f.kycType === 'Aadhaar' 
+                  ? '🔒 Aadhaar identity authentication ke liye. Poora data end-to-end encrypted rehta hai.' 
+                  : '💼 PAN card TDS deduction aur direct legal bank payout transfers ke liye.'}
+              </span>
+            </div>
+
+            {/* Field 5: Profession / Profile Role (Quick Chips) */}
+            <div style={{ marginBottom: '28px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
+                <Briefcase size={16} style={{ color: 'var(--blue)' }} /> 5. Aapka Profession / Profile (Quick Select)
               </label>
-              <input id="join-kyc" placeholder="Aadhaar ya PAN number" value={f.k} onChange={set('k')} style={inputStyle} />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
+                {[
+                  ['Political / Social Worker', '🏛️ Political / Social'],
+                  ['Digital Campaigner', '📱 Digital Campaigner'],
+                  ['Local Consultant', '🏢 Local Business / Pro'],
+                  ['Freelancer / Student', '🎓 Freelancer / Student']
+                ].map(([val, label]) => {
+                  const isSel = f.profession === val;
+                  return (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setF(prev => ({ ...prev, profession: val }))}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: '10px',
+                        border: isSel ? '2px solid var(--navy)' : '1px solid var(--line)',
+                        background: isSel ? 'var(--navy)' : '#f8fafc',
+                        color: isSel ? '#fff' : 'var(--navy)',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.2s ease',
+                        boxShadow: isSel ? '0 4px 10px rgba(15,23,42,0.15)' : 'none'
+                      }}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <button id="step0-next-btn" className="btn" onClick={next} style={{ width: '100%', padding: '18px', fontSize: '1.1rem', borderRadius: '12px', boxShadow: '0 8px 16px rgba(234, 179, 8, 0.2)' }}>
-              Aage badhein <ArrowRight size={18} className="nav-icon" />
+            {/* Partner Guarantee Notice */}
+            <div style={{ background: '#f8fafc', border: '1px solid var(--line)', padding: '14px 18px', borderRadius: '12px', marginBottom: '28px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <ShieldCheck size={24} style={{ color: '#10b981', flexShrink: 0 }} />
+              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--navy)', lineHeight: '1.4' }}>
+                <strong>Poll Craft Trust:</strong> 40% Guaranteed revenue share on seat bookings. Exclusive locked territory with live candidate leads.
+              </p>
+            </div>
+
+            {/* Next Step Button */}
+            <button 
+              id="step0-next-btn" 
+              className="btn" 
+              onClick={next} 
+              style={{ width: '100%', padding: '18px', fontSize: '1.1rem', borderRadius: '12px', boxShadow: '0 8px 16px rgba(234, 179, 8, 0.25)', justifyContent: 'center' }}
+            >
+              OTP Bhejein & Verify Karein <ArrowRight size={18} className="nav-icon" />
             </button>
 
-            <p style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.95rem', color: 'var(--muted)' }}>
+            {/* Quick Open Territory Button */}
+            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+              <button 
+                type="button" 
+                onClick={() => { setErr(''); setStep(2); }} 
+                style={{ background: 'none', border: 'none', color: 'var(--blue)', fontWeight: '700', fontSize: '0.92rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <MapPin size={15} /> Pehle Territory (Area & Block) Dekhna Chahte Hain? Click karein →
+              </button>
+            </div>
+
+            <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '0.95rem', color: 'var(--muted)', margin: '20px 0 0' }}>
               Pehle se account hai? <Link href="/login" style={{ color: 'var(--blue)', fontWeight: '800', textDecoration: 'underline' }}>Login Karein</Link>
             </p>
           </>}
