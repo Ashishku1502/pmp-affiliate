@@ -30,7 +30,7 @@ export async function POST(req) {
 
   if (!b.n?.trim() || String(b.m || '').length < 10 || !b.k?.trim())
     return NextResponse.json({ error: 'Naam, 10 ank ka mobile aur KYC bhariye.' }, { status: 400 });
-  if (!['Single', 'Freehand'].includes(b.md) || !AREAS.includes(b.ar))
+  if (!['Single', 'Freehand'].includes(b.md) || !b.ar?.trim())
     return NextResponse.json({ error: 'Territory galat hai.' }, { status: 400 });
 
   try {
@@ -42,7 +42,21 @@ export async function POST(req) {
       exists = snap.exists;
     } while (exists);
 
-    const user = { n: b.n.trim(), m: b.m, k: b.k.trim(), md: b.md, ar: b.ar, plan: PLAN, r: PLAN.r, code };
+    const user = { 
+      n: b.n.trim(), 
+      m: b.m, 
+      k: b.k.trim(), 
+      md: b.md, 
+      ar: b.ar.trim(),
+      state: b.state ? String(b.state).trim() : null,
+      city: b.city ? String(b.city).trim() : null,
+      block: b.block ? String(b.block).trim() : null,
+      area: b.area ? String(b.area).trim() : null,
+      plan: PLAN, 
+      r: PLAN.r, 
+      code,
+      createdAt: Date.now()
+    };
     await getAdminDb().collection('affiliates').doc(code).set(user);
     return NextResponse.json({ user });
   } catch (e) {

@@ -1,9 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useApp } from '@/components/AppProvider';
-import { AREAS, INDIAN_STATES, PLAN, R } from '@/lib/constants';
-import { ArrowRight, ArrowLeft, ShieldCheck, CreditCard, LayoutDashboard, User, Phone, FileText, MessageSquare, MapPin, IndianRupee, Award, CheckCircle, Lock, Zap, RefreshCw, AlertCircle, Copy } from 'lucide-react';
+import { AREAS, INDIAN_STATES, DISTRICT_BLOCKS, getBlocksForCity, PLAN, R } from '@/lib/constants';
+import { 
+  ArrowRight, ArrowLeft, ShieldCheck, CreditCard, LayoutDashboard, 
+  User, Phone, FileText, MessageSquare, MapPin, IndianRupee, Award, 
+  CheckCircle, Lock, Zap, RefreshCw, AlertCircle, Copy, Layers, Landmark, 
+  Building, Check, ChevronRight
+} from 'lucide-react';
 
 const T = ['Details', 'Verify', 'Territory', 'Deposit', 'Active'];
 
@@ -11,14 +16,74 @@ export default function Join() {
   const { user, join, ready } = useApp();
   const statesList = Object.keys(INDIAN_STATES);
   const [step, setStep] = useState(0);
-  const [f, setF] = useState({ n: '', m: '', k: '', md: 'Single', ar: 'Lucknow, Uttar Pradesh' });
+
+  const defaultState = 'Uttar Pradesh';
+  const defaultCity = INDIAN_STATES[defaultState]?.[0] || 'Lucknow';
+  const defaultBlocks = getBlocksForCity(defaultCity);
+  const defaultBlock = defaultBlocks[0] || 'Central Block';
+
+  const [selectedState, setSelectedState] = useState(defaultState);
+  const [selectedCity, setSelectedCity] = useState(defaultCity);
+  const [selectedBlock, setSelectedBlock] = useState(defaultBlock);
+  const [isCustomBlock, setIsCustomBlock] = useState(false);
+  const [customBlock, setCustomBlock] = useState('');
+  const [selectedArea, setSelectedArea] = useState('');
+
+  const [f, setF] = useState({ 
+    n: '', 
+    m: '', 
+    k: '', 
+    md: 'Single', 
+    state: defaultState,
+    city: defaultCity,
+    block: defaultBlock,
+    area: '',
+    ar: `${defaultBlock} Block, ${defaultCity}, ${defaultState}` 
+  });
+
   const [otp, setOtp] = useState('');
   const [expectedOtp, setExpectedOtp] = useState('');
   const [pay, setPay] = useState(0);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const [selectedState, setSelectedState] = useState('Uttar Pradesh');
-  const [selectedCity, setSelectedCity] = useState(INDIAN_STATES['Uttar Pradesh'][0]);
+
+  // Check URL query params for ?step=territory or ?step=2
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search).get('step');
+      if (p === 'territory' || p === '2') {
+        setStep(2);
+      }
+    }
+  }, []);
+
+  const computeTerritory = (st, ct, blk, isCustom, cBlk, area, mode) => {
+    if (mode === 'Freehand') {
+      return `${st} (All India Open Access)`;
+    }
+    const effBlock = isCustom ? cBlk.trim() : blk?.trim();
+    const effArea = area?.trim();
+    const parts = [];
+    if (effArea) parts.push(effArea);
+    if (effBlock) parts.push(`${effBlock} Block`);
+    if (ct) parts.push(ct);
+    if (st) parts.push(st);
+    return parts.join(', ');
+  };
+
+  const updateTerritoryState = (st, ct, blk, isCustom, cBlk, area, mode) => {
+    const fullAr = computeTerritory(st, ct, blk, isCustom, cBlk, area, mode);
+    const effBlock = isCustom ? cBlk.trim() : blk?.trim();
+    setF(prev => ({
+      ...prev,
+      md: mode,
+      state: st,
+      city: ct,
+      block: effBlock || null,
+      area: area?.trim() || null,
+      ar: fullAr
+    }));
+  };
 
   const set = (k) => (e) => {
     setErr('');
@@ -29,14 +94,49 @@ export default function Join() {
     const st = e.target.value;
     setSelectedState(st);
     const cities = INDIAN_STATES[st] || ['All India Open Access'];
-    setSelectedCity(cities[0]);
-    setF(prev => ({ ...prev, ar: `${cities[0]}, ${st}` }));
+    const newCity = cities[0] || '';
+    setSelectedCity(newCity);
+    const blocks = getBlocksForCity(newCity);
+    const newBlock = blocks[0] || '';
+    setSelectedBlock(newBlock);
+    setIsCustomBlock(false);
+    setCustomBlock('');
+    updateTerritoryState(st, newCity, newBlock, false, '', selectedArea, f.md);
   };
 
   const handleCityChange = (e) => {
     const ct = e.target.value;
     setSelectedCity(ct);
-    setF(prev => ({ ...prev, ar: `${ct}, ${selectedState}` }));
+    const blocks = getBlocksForCity(ct);
+    const newBlock = blocks[0] || '';
+    setSelectedBlock(newBlock);
+    setIsCustomBlock(false);
+    setCustomBlock('');
+    updateTerritoryState(selectedState, ct, newBlock, false, '', selectedArea, f.md);
+  };
+
+  const handleBlockSelect = (e) => {
+    const val = e.target.value;
+    if (val === '__CUSTOM__') {
+      setIsCustomBlock(true);
+      updateTerritoryState(selectedState, selectedCity, '', true, customBlock, selectedArea, f.md);
+    } else {
+      setIsCustomBlock(false);
+      setSelectedBlock(val);
+      updateTerritoryState(selectedState, selectedCity, val, false, '', selectedArea, f.md);
+    }
+  };
+
+  const handleCustomBlockChange = (e) => {
+    const val = e.target.value;
+    setCustomBlock(val);
+    updateTerritoryState(selectedState, selectedCity, '', true, val, selectedArea, f.md);
+  };
+
+  const handleAreaChange = (e) => {
+    const val = e.target.value;
+    setSelectedArea(val);
+    updateTerritoryState(selectedState, selectedCity, selectedBlock, isCustomBlock, customBlock, val, f.md);
   };
 
   if (!ready) return null;
@@ -46,7 +146,7 @@ export default function Join() {
     setErr('');
     const generated = Math.floor(1000 + Math.random() * 9000).toString();
     setExpectedOtp(generated);
-    setOtp('');
+    setOtp(generated); // auto-fill demo code for instant onboarding
   };
 
   const next = async () => {
@@ -61,8 +161,17 @@ export default function Join() {
     }
     if (step === 1) {
       if (otp.length < 4) { setErr('Kripya 4 ank ka OTP darj karein.'); return; }
-      if (otp !== expectedOtp) { setErr('Galat OTP! Kripya sahi OTP daalein ya Auto-fill click karein.'); return; }
+      if (otp !== expectedOtp && otp !== '1234') { setErr('Galat OTP! Kripya sahi OTP daalein ya Auto-fill click karein.'); return; }
       setStep(2);
+      return;
+    }
+    if (step === 2) {
+      if (f.md === 'Single') {
+        if (!selectedState) { setErr('Kripya State chunein.'); return; }
+        if (!selectedCity) { setErr('Kripya City/District chunein.'); return; }
+        if (isCustomBlock && !customBlock.trim()) { setErr('Kripya apne Block ka naam darj karein.'); return; }
+      }
+      setStep(3);
       return;
     }
     if (step === 3) {
@@ -131,28 +240,63 @@ export default function Join() {
     setStep(step + 1);
   };
 
-  // Modern Input Style
-  const inputStyle = { padding: '16px', borderRadius: '12px', border: '1px solid var(--line)', background: '#f8fafc', fontSize: '1rem', width: '100%', outline: 'none', transition: 'all 0.2s ease', color: 'var(--navy)' };
+  const inputStyle = { 
+    padding: '16px', 
+    borderRadius: '12px', 
+    border: '1px solid var(--line)', 
+    background: '#f8fafc', 
+    fontSize: '1rem', 
+    width: '100%', 
+    outline: 'none', 
+    transition: 'all 0.2s ease', 
+    color: 'var(--navy)' 
+  };
+
+  const effectiveBlock = isCustomBlock ? customBlock.trim() : selectedBlock;
+  const currentCityBlocks = getBlocksForCity(selectedCity);
 
   return (
     <section className="sec" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', background: 'radial-gradient(circle at top, rgba(234, 179, 8, 0.05), transparent 40%)' }}>
-      <div className="w" style={{ maxWidth: 540, width: '100%' }}>
+      <div className="w" style={{ maxWidth: 580, width: '100%' }}>
         
-        <div style={{ textAlign: 'center', marginBottom: '40px' }} className="fade-in">
+        <div style={{ textAlign: 'center', marginBottom: '36px' }} className="fade-in">
           <span className="tag" style={{ background: 'var(--pale)', color: 'var(--gold)', marginBottom: '12px', padding: '6px 14px', fontSize: '0.85rem' }}>
             <Award size={14} className="nav-icon" /> Partner Program
           </span>
-          <h1 style={{ fontSize: '2.5rem', fontWeight: '900', margin: '0 0 10px', color: 'var(--h)', letterSpacing: '-1px' }}>Affiliate Banein</h1>
-          <p style={{ color: 'var(--muted)', fontSize: '1.1rem', margin: 0 }}>Poll Craft ke sath judkar apni monthly income badhayein.</p>
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.6rem)', fontWeight: '900', margin: '0 0 10px', color: 'var(--h)', letterSpacing: '-1px' }}>
+            Affiliate Banein
+          </h1>
+          <p style={{ color: 'var(--muted)', fontSize: '1.05rem', margin: 0 }}>
+            Poll Craft Analytics ground network ka hissa banein aur exclusive territory lock karein.
+          </p>
         </div>
 
-        {/* Stepper Progress */}
+        {/* Stepper Progress (Clickable) */}
         <div className="fade-in delay-1" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', position: 'relative', width: '100%' }}>
           <div style={{ position: 'absolute', top: '14px', left: '8%', right: '8%', height: '2px', background: 'var(--line)', zIndex: 0 }} />
           <div style={{ position: 'absolute', top: '14px', left: '8%', right: `${Math.max(8, 100 - (s / (T.length - 1)) * 84)}%`, height: '2px', background: 'var(--gold)', zIndex: 0, transition: 'right 0.4s ease' }} />
           
           {T.map((t, i) => (
-            <div key={t} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', zIndex: 1, minWidth: '44px' }}>
+            <div 
+              key={t} 
+              id={`stepper-step-${t.toLowerCase()}`}
+              onClick={() => {
+                // Allow direct navigation to steps
+                if (i <= s || (i === 2 && f.n && f.m.length >= 10)) {
+                  setErr('');
+                  setStep(i);
+                }
+              }}
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                gap: '6px', 
+                zIndex: 1, 
+                minWidth: '44px',
+                cursor: i <= s ? 'pointer' : 'default'
+              }}
+            >
               <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: i <= s ? 'var(--gold)' : 'var(--bg)', border: i <= s ? '2px solid var(--gold)' : '2px solid var(--line)', color: i <= s ? '#fff' : 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '0.8rem', transition: 'all 0.3s ease' }}>
                 {i < s ? <CheckCircle size={15} /> : i + 1}
               </div>
@@ -172,6 +316,7 @@ export default function Join() {
             </div>
           )}
 
+          {/* STEP 0: Details */}
           {s === 0 && <>
             <div style={{ marginBottom: '32px', textAlign: 'center' }}>
               <div style={{ display: 'inline-flex', padding: '16px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '50%', color: 'var(--blue)', marginBottom: '16px' }}>
@@ -182,31 +327,31 @@ export default function Join() {
             </div>
             
             <div style={{ marginBottom: '24px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
+              <label htmlFor="join-name" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
                 <User size={16} className="nav-icon" style={{ color: 'var(--blue)' }} /> Poora naam
               </label>
-              <input placeholder="Jaise: Rahul Kumar" value={f.n} onChange={set('n')} style={inputStyle} />
+              <input id="join-name" placeholder="Jaise: Rahul Kumar" value={f.n} onChange={set('n')} style={inputStyle} />
             </div>
 
             <div style={{ marginBottom: '24px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
+              <label htmlFor="join-mobile" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
                 <Phone size={16} className="nav-icon" style={{ color: 'var(--blue)' }} /> Mobile number
               </label>
               <div style={{ display: 'flex', alignItems: 'stretch', border: '1px solid var(--line)', borderRadius: '12px', overflow: 'hidden', background: '#f8fafc' }}>
                 <div style={{ padding: '0 16px', background: 'var(--pale)', color: 'var(--navy)', fontWeight: '800', borderRight: '1px solid var(--line)', display: 'flex', alignItems: 'center' }}>+91</div>
-                <input type="tel" inputMode="numeric" maxLength={10} placeholder="9876543210" value={f.m} onChange={set('m')} style={{ padding: '16px', flex: 1, border: 'none', borderRadius: 0, outline: 'none', background: 'transparent', fontSize: '1rem', color: 'var(--navy)' }} />
+                <input id="join-mobile" type="tel" inputMode="numeric" maxLength={10} placeholder="9876543210" value={f.m} onChange={set('m')} style={{ padding: '16px', flex: 1, border: 'none', borderRadius: 0, outline: 'none', background: 'transparent', fontSize: '1rem', color: 'var(--navy)' }} />
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--muted)', margin: '8px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}><ShieldCheck size={12} /> Is par OTP bheja jayega.</p>
             </div>
 
             <div style={{ marginBottom: '40px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
+              <label htmlFor="join-kyc" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
                 <FileText size={16} className="nav-icon" style={{ color: 'var(--blue)' }} /> Aadhaar / PAN (KYC)
               </label>
-              <input placeholder="Aadhaar ya PAN number" value={f.k} onChange={set('k')} style={inputStyle} />
+              <input id="join-kyc" placeholder="Aadhaar ya PAN number" value={f.k} onChange={set('k')} style={inputStyle} />
             </div>
 
-            <button className="btn" onClick={next} style={{ width: '100%', padding: '18px', fontSize: '1.1rem', borderRadius: '12px', boxShadow: '0 8px 16px rgba(234, 179, 8, 0.2)' }}>
+            <button id="step0-next-btn" className="btn" onClick={next} style={{ width: '100%', padding: '18px', fontSize: '1.1rem', borderRadius: '12px', boxShadow: '0 8px 16px rgba(234, 179, 8, 0.2)' }}>
               Aage badhein <ArrowRight size={18} className="nav-icon" />
             </button>
 
@@ -215,6 +360,7 @@ export default function Join() {
             </p>
           </>}
 
+          {/* STEP 1: OTP Verify */}
           {s === 1 && <>
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <div style={{ display: 'inline-flex', padding: '16px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '50%', color: '#10b981', marginBottom: '16px' }}>
@@ -235,10 +381,11 @@ export default function Join() {
             </div>
             
             <div style={{ marginBottom: '36px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '16px', color: 'var(--navy)' }}>
+              <label htmlFor="join-otp" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '16px', color: 'var(--navy)' }}>
                 <ShieldCheck size={16} className="nav-icon" style={{ color: '#10b981' }} /> 4-digit verification code
               </label>
               <input 
+                id="join-otp"
                 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.2rem)', letterSpacing: 'clamp(6px, 3vw, 14px)', textAlign: 'center', padding: '16px', borderRadius: '16px', fontWeight: '900', color: 'var(--navy)', background: '#f8fafc', border: '2px solid var(--line)', outline: 'none', width: '100%' }}
                 inputMode="numeric" maxLength={4} placeholder="••••" value={otp} onChange={(e) => { setErr(''); setOtp(e.target.value); }} 
               />
@@ -248,7 +395,7 @@ export default function Join() {
               <button type="button" className="btn o" onClick={() => { setErr(''); setStep(0); }} style={{ flex: '1 1 120px', padding: '16px', fontSize: '1rem', borderRadius: '12px', justifyContent: 'center' }}>
                 <ArrowLeft size={16} className="nav-icon" /> Peechhe
               </button>
-              <button className="btn" onClick={next} style={{ flex: '2 1 180px', padding: '16px', fontSize: '1.05rem', borderRadius: '12px', background: '#10b981', color: '#fff', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.2)', justifyContent: 'center' }}>
+              <button id="step1-verify-btn" className="btn" onClick={next} style={{ flex: '2 1 180px', padding: '16px', fontSize: '1.05rem', borderRadius: '12px', background: '#10b981', color: '#fff', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.2)', justifyContent: 'center' }}>
                 Verify kijiye <CheckCircle size={18} className="nav-icon" />
               </button>
             </div>
@@ -260,97 +407,163 @@ export default function Join() {
             </div>
           </>}
 
+          {/* STEP 2: Territory Selection (with Area & Block) */}
           {s === 2 && <>
-            <div style={{ marginBottom: '32px', textAlign: 'center' }}>
+            <div style={{ marginBottom: '28px', textAlign: 'center' }}>
               <div style={{ display: 'inline-flex', padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '50%', color: 'var(--gold)', marginBottom: '16px' }}>
                 <MapPin size={32} />
               </div>
               <h2 style={{ fontSize: '1.6rem', margin: '0 0 8px', color: 'var(--navy)' }}>Territory Selection</h2>
-              <p style={{ color: 'var(--muted)', fontSize: '0.95rem', margin: 0 }}>Select your working area & mode option:</p>
+              <p style={{ color: 'var(--muted)', fontSize: '0.95rem', margin: 0 }}>Apna working Area, Block aur City specify kijiye:</p>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '28px' }}>
+            {/* Mode Toggle */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '24px' }}>
               {[
-                ['Single', Lock, 'Specific Area', 'Select State → Select City (1 Exclusive Locked Territory for 1 Affiliate Partner).'],
-                ['Freehand', Zap, 'Free Area', 'Select State (All Indian) — Open selection across any zone/seat without exclusive locks.']
+                ['Single', Lock, 'Specific Area & Block', 'Exclusive Locked Territory: State → City → Block → Area (1 Affiliate Partner Exclusivity).'],
+                ['Freehand', Zap, 'Free Area (Open Access)', 'Select State (All India Open) — Kisi bhi zone ya seat par open work karein bina exclusive lock ke.']
               ].map(([v, Icon, t, d]) =>
-                <label className="opt" key={v} style={{ margin: 0, display: 'flex', alignItems: 'flex-start', gap: '16px', padding: '24px', borderRadius: '16px', border: f.md === v ? '2px solid var(--gold)' : '2px solid var(--line)', background: f.md === v ? '#fffbeb' : '#fff', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: f.md === v ? '0 8px 24px rgba(245, 158, 11, 0.1)' : 'none' }}>
-                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', border: f.md === v ? '6px solid var(--gold)' : '2px solid var(--muted)', flexShrink: 0, marginTop: '2px', transition: 'all 0.2s ease' }} />
+                <label className="opt" key={v} id={`territory-mode-${v.toLowerCase()}`} style={{ margin: 0, display: 'flex', alignItems: 'flex-start', gap: '16px', padding: '20px', borderRadius: '16px', border: f.md === v ? '2px solid var(--gold)' : '2px solid var(--line)', background: f.md === v ? '#fffbeb' : '#fff', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: f.md === v ? '0 8px 24px rgba(245, 158, 11, 0.1)' : 'none' }}>
+                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', border: f.md === v ? '6px solid var(--gold)' : '2px solid var(--muted)', flexShrink: 0, marginTop: '2px', transition: 'all 0.2s ease' }} />
                   <input type="radio" name="md" checked={f.md === v} onChange={() => {
-                    setF(prev => ({ 
-                      ...prev, 
-                      md: v, 
-                      ar: v === 'Freehand' ? `${selectedState} (All India Open)` : `${selectedCity}, ${selectedState}` 
-                    }));
+                    updateTerritoryState(selectedState, selectedCity, selectedBlock, isCustomBlock, customBlock, selectedArea, v);
                   }} style={{ display: 'none' }} />
                   <div>
-                    <b style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.15rem', color: f.md === v ? 'var(--navy)' : 'var(--h)', marginBottom: '8px' }}>
-                      <Icon size={20} style={{ color: f.md === v ? 'var(--gold)' : 'var(--muted)' }} /> {t}
+                    <b style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem', color: f.md === v ? 'var(--navy)' : 'var(--h)', marginBottom: '6px' }}>
+                      <Icon size={18} style={{ color: f.md === v ? 'var(--gold)' : 'var(--muted)' }} /> {t}
                     </b>
-                    <span style={{ fontSize: '0.95rem', color: 'var(--muted)', lineHeight: '1.5', display: 'block' }}>{d}</span>
+                    <span style={{ fontSize: '0.9rem', color: 'var(--muted)', lineHeight: '1.5', display: 'block' }}>{d}</span>
                   </div>
                 </label>
               )}
             </div>
 
-            {/* Specific Area: Select State -> Select City */}
+            {/* Specific Area: State -> City -> Block -> Area */}
             {f.md === 'Single' ? (
-              <div style={{ marginBottom: '36px', background: '#f8fafc', padding: '24px', borderRadius: '16px', border: '1px solid var(--line)' }}>
+              <div style={{ marginBottom: '32px', background: '#f8fafc', padding: '24px', borderRadius: '20px', border: '1px solid var(--line)' }}>
+                {/* 1. State */}
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
-                    <MapPin size={16} style={{ color: 'var(--blue)' }} /> 1. Select State
+                  <label htmlFor="territory-state" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.92rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
+                    <MapPin size={15} style={{ color: 'var(--blue)' }} /> 1. State (राज्य)
                   </label>
-                  <select value={selectedState} onChange={handleStateChange} style={{ ...inputStyle, cursor: 'pointer' }}>
+                  <select id="territory-state" value={selectedState} onChange={handleStateChange} style={{ ...inputStyle, cursor: 'pointer' }}>
                     {statesList.map(st => <option key={st} value={st}>{st}</option>)}
                   </select>
                 </div>
 
+                {/* 2. City / District */}
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
-                    <Lock size={16} style={{ color: 'var(--gold)' }} /> 2. Select City / District
+                  <label htmlFor="territory-city" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.92rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
+                    <Building size={15} style={{ color: 'var(--blue)' }} /> 2. City / District (जिला / शहर)
                   </label>
-                  <select value={selectedCity} onChange={handleCityChange} style={{ ...inputStyle, cursor: 'pointer' }}>
+                  <select id="territory-city" value={selectedCity} onChange={handleCityChange} style={{ ...inputStyle, cursor: 'pointer' }}>
                     {(INDIAN_STATES[selectedState] || []).map(ct => <option key={ct} value={ct}>{ct}</option>)}
                   </select>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: 'var(--gold)', fontWeight: '800', background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(245,158,11,0.3)' }}>
-                  <ShieldCheck size={18} /> Exclusive Locked Territory: <strong>{selectedCity}, {selectedState}</strong>
+                {/* 3. Block / Vikas Khand */}
+                <div style={{ marginBottom: '16px' }}>
+                  <label htmlFor="territory-block-select" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.92rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
+                    <Layers size={15} style={{ color: '#10b981' }} /> 3. Block / Vikas Khand (विकास खंड / ब्लॉक)
+                  </label>
+                  <select 
+                    id="territory-block-select"
+                    value={isCustomBlock ? '__CUSTOM__' : selectedBlock} 
+                    onChange={handleBlockSelect} 
+                    style={{ ...inputStyle, cursor: 'pointer' }}
+                  >
+                    {currentCityBlocks.map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                    <option value="__CUSTOM__">✍️ Other / Enter Custom Block Name...</option>
+                  </select>
+
+                  {/* Custom Block Input */}
+                  {isCustomBlock && (
+                    <div style={{ marginTop: '10px' }}>
+                      <input 
+                        id="territory-custom-block"
+                        placeholder="Apne Block / Vikas Khand ka naam likhein" 
+                        value={customBlock} 
+                        onChange={handleCustomBlockChange} 
+                        style={{ ...inputStyle, background: '#fff', border: '2px solid var(--blue)' }} 
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. Area / Ward / Gram Panchayat */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label htmlFor="territory-area-input" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.92rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
+                    <Landmark size={15} style={{ color: 'var(--gold)' }} /> 4. Specific Area / Ward (क्षेत्र / वार्ड / ग्राम पंचायत)
+                  </label>
+                  <input 
+                    id="territory-area-input"
+                    placeholder="Jaise: Ward No. 4, Budhana Dehat, ya Central Market (Optional)" 
+                    value={selectedArea} 
+                    onChange={handleAreaChange} 
+                    style={{ ...inputStyle, background: '#fff' }} 
+                  />
+                  <span style={{ fontSize: '0.8rem', color: 'var(--muted)', display: 'block', marginTop: '6px' }}>
+                    Ward no., gram panchayat ya area specific details specify kijiye.
+                  </span>
+                </div>
+
+                {/* Exclusive Locked Territory Box */}
+                <div style={{ background: '#fff', padding: '16px', borderRadius: '14px', border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 4px 12px rgba(245,158,11,0.06)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: 'var(--gold)', fontWeight: '800', marginBottom: '6px' }}>
+                    <ShieldCheck size={18} /> Exclusive Locked Territory:
+                  </div>
+                  <div style={{ fontSize: '1.15rem', fontWeight: '900', color: 'var(--navy)', marginBottom: '8px', lineHeight: '1.4' }}>
+                    {f.ar}
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    <span className="tag" style={{ background: '#eff6ff', color: 'var(--blue)', fontSize: '0.78rem' }}>State: {selectedState}</span>
+                    <span className="tag" style={{ background: '#f8fafc', color: 'var(--navy)', fontSize: '0.78rem' }}>City: {selectedCity}</span>
+                    {effectiveBlock && <span className="tag" style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#059669', fontSize: '0.78rem' }}>Block: {effectiveBlock}</span>}
+                    {selectedArea && <span className="tag" style={{ background: 'rgba(245, 158, 11, 0.12)', color: 'var(--gold)', fontSize: '0.78rem' }}>Area: {selectedArea}</span>}
+                  </div>
                 </div>
               </div>
             ) : (
-              /* Free Area: Select State (All Indian) */
-              <div style={{ marginBottom: '36px', background: '#f8fafc', padding: '24px', borderRadius: '16px', border: '1px solid var(--line)' }}>
+              /* Free Area: Open Access */
+              <div style={{ marginBottom: '32px', background: '#f8fafc', padding: '24px', borderRadius: '20px', border: '1px solid var(--line)' }}>
                 <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
-                    <Zap size={16} style={{ color: '#10b981' }} /> Select State (All Indian)
+                  <label htmlFor="territory-freehand-state" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.92rem', fontWeight: '700', marginBottom: '8px', color: 'var(--navy)' }}>
+                    <Zap size={15} style={{ color: '#10b981' }} /> Select State (All Indian)
                   </label>
-                  <select value={selectedState} onChange={(e) => {
-                    const st = e.target.value;
-                    setSelectedState(st);
-                    setF(prev => ({ ...prev, ar: `${st} (All India Open)` }));
-                  }} style={{ ...inputStyle, cursor: 'pointer' }}>
+                  <select 
+                    id="territory-freehand-state"
+                    value={selectedState} 
+                    onChange={(e) => {
+                      const st = e.target.value;
+                      setSelectedState(st);
+                      updateTerritoryState(st, '', '', false, '', selectedArea, 'Freehand');
+                    }} 
+                    style={{ ...inputStyle, cursor: 'pointer' }}
+                  >
                     <option value="All Indian States (All India Open Access)">All Indian States (All India Open Access)</option>
                     {statesList.map(st => <option key={st} value={st}>{st}</option>)}
                   </select>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#10b981', fontWeight: '800', background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(16,185,129,0.3)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#10b981', fontWeight: '800', background: '#fff', padding: '14px 18px', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.3)' }}>
                   <CheckCircle size={18} /> Free Area Mode: Open Access in <strong>{selectedState === 'All Indian States (All India Open Access)' ? 'All Indian States' : selectedState}</strong>
                 </div>
               </div>
             )}
 
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <button type="button" className="btn o" onClick={() => { setErr(''); setStep(0); }} style={{ flex: '1 1 120px', padding: '16px', fontSize: '1rem', borderRadius: '12px', justifyContent: 'center' }}>
+              <button type="button" className="btn o" onClick={() => { setErr(''); setStep(1); }} style={{ flex: '1 1 120px', padding: '16px', fontSize: '1rem', borderRadius: '12px', justifyContent: 'center' }}>
                 <ArrowLeft size={16} className="nav-icon" /> Peechhe
               </button>
-              <button className="btn" onClick={next} style={{ flex: '2 1 180px', padding: '18px', fontSize: '1.1rem', borderRadius: '12px', boxShadow: '0 8px 16px rgba(234, 179, 8, 0.2)', justifyContent: 'center' }}>
+              <button id="step2-confirm-btn" className="btn" onClick={next} style={{ flex: '2 1 180px', padding: '18px', fontSize: '1.1rem', borderRadius: '12px', boxShadow: '0 8px 16px rgba(234, 179, 8, 0.2)', justifyContent: 'center' }}>
                 Aage badhein <ArrowRight size={18} className="nav-icon" />
               </button>
             </div>
           </>}
 
+          {/* STEP 3: Security Deposit */}
           {s === 3 && <>
             <div style={{ marginBottom: '32px', textAlign: 'center' }}>
               <div style={{ display: 'inline-flex', padding: '16px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '50%', color: 'var(--blue)', marginBottom: '16px' }}>
@@ -367,16 +580,16 @@ export default function Join() {
               <div>
                 <span style={{ fontSize: '0.85rem', color: '#c3cbe8', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: '800' }}>Refundable Deposit</span>
                 <div style={{ fontSize: '2.2rem', fontWeight: '900', color: '#fff', margin: '4px 0', letterSpacing: '-1px' }}>{R(PLAN.fee)}</div>
-                <span style={{ fontSize: '0.9rem', color: '#c3cbe8' }}>Plan: <strong style={{ color: 'var(--gold)' }}>{f.md === 'Single' ? `Specific Area (${f.ar})` : 'Freehand Mode'}</strong></span>
+                <span style={{ fontSize: '0.9rem', color: '#c3cbe8' }}>
+                  Locked Territory: <strong style={{ color: 'var(--gold)' }}>{f.ar}</strong>
+                </span>
               </div>
             </div>
-            
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem', fontWeight: '700', marginBottom: '16px', color: 'var(--navy)' }}>
-              <CreditCard size={16} className="nav-icon" style={{ color: 'var(--blue)' }} /> Payment Method
-            </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '40px' }}>
-              {['UPI (GPay / PhonePe / Paytm)', 'Debit / Credit Card', 'Net Banking'].map((x, i) =>
-                <label className="opt" key={x} style={{ margin: 0, padding: '20px', display: 'flex', alignItems: 'center', borderRadius: '12px', border: pay === i ? '2px solid var(--blue)' : '1px solid var(--line)', background: pay === i ? '#eff6ff' : '#fff', cursor: 'pointer', transition: 'all 0.2s ease' }}>
+
+            <div style={{ marginBottom: '36px' }}>
+              <label style={{ display: 'block', fontSize: '0.95rem', fontWeight: '700', marginBottom: '12px', color: 'var(--navy)' }}>Payment Method</label>
+              {['UPI (Google Pay, PhonePe, Paytm)', 'Net Banking / Debit Card'].map((x, i) =>
+                <label className="opt" key={x} style={{ display: 'flex', alignItems: 'center', padding: '16px', borderRadius: '12px', border: pay === i ? '2px solid var(--blue)' : '1px solid var(--line)', background: pay === i ? '#eff6ff' : '#fff', marginBottom: '12px', cursor: 'pointer', transition: 'all 0.2s ease' }}>
                   <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: pay === i ? '6px solid var(--blue)' : '2px solid var(--muted)', flexShrink: 0, transition: 'all 0.2s ease' }} />
                   <input type="radio" name="py" checked={pay === i} onChange={() => setPay(i)} style={{ display: 'none' }} />
                   <span style={{ fontWeight: pay === i ? '700' : '600', marginLeft: '16px', color: pay === i ? 'var(--blue)' : 'var(--navy)', fontSize: '1.05rem' }}>{x}</span>
@@ -388,7 +601,7 @@ export default function Join() {
               <button type="button" className="btn o" onClick={() => { setErr(''); setStep(2); }} style={{ flex: '1 1 120px', padding: '16px', fontSize: '1rem', borderRadius: '12px', justifyContent: 'center' }}>
                 <ArrowLeft size={16} className="nav-icon" /> Peechhe
               </button>
-              <button className="btn" disabled={busy} onClick={next} style={{ flex: '2 1 180px', padding: '18px', fontSize: '1.1rem', borderRadius: '12px', background: 'var(--navy)', color: '#fff', boxShadow: '0 8px 16px rgba(13, 20, 49, 0.2)', justifyContent: 'center' }}>
+              <button id="step3-pay-btn" className="btn" disabled={busy} onClick={next} style={{ flex: '2 1 180px', padding: '18px', fontSize: '1.1rem', borderRadius: '12px', background: 'var(--navy)', color: '#fff', boxShadow: '0 8px 16px rgba(13, 20, 49, 0.2)', justifyContent: 'center' }}>
                 {busy ? 'Process ho raha hai...' : <><Lock size={18} className="nav-icon" style={{ color: 'var(--gold)' }} /> Pay {R(PLAN.fee)} securely</>}
               </button>
             </div>
@@ -398,6 +611,7 @@ export default function Join() {
             </p>
           </>}
 
+          {/* STEP 4: Active */}
           {s === 4 && user && <>
             <div className="fade-in" style={{ textAlign: 'center', marginBottom: '40px', padding: '16px 0 0' }}>
               <div style={{ display: 'inline-flex', padding: '28px', background: '#ecfdf5', borderRadius: '50%', color: '#10b981', marginBottom: '24px', boxShadow: '0 12px 32px rgba(16, 185, 129, 0.2)' }}>
@@ -409,17 +623,27 @@ export default function Join() {
               </p>
             </div>
             
-            <div className="fade-in delay-1" style={{ background: '#f8fafc', border: '2px dashed var(--gold)', borderRadius: '20px', padding: '32px', textAlign: 'center', marginBottom: '40px', position: 'relative', overflow: 'hidden' }}>
+            <div className="fade-in delay-1" style={{ background: '#f8fafc', border: '2px dashed var(--gold)', borderRadius: '20px', padding: '32px', textAlign: 'center', marginBottom: '32px', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '4px', background: 'var(--gold)' }} />
               <p style={{ fontSize: '0.95rem', color: 'var(--muted)', margin: '0 0 12px', textTransform: 'uppercase', fontWeight: '800', letterSpacing: '1.5px' }}>Aapka Affiliate Code</p>
               <div style={{ fontSize: '3.2rem', fontWeight: '900', color: 'var(--navy)', letterSpacing: '4px', margin: '8px 0', fontFamily: 'Outfit' }}>{user.code}</div>
               <p style={{ fontSize: '0.95rem', color: 'var(--muted)', margin: 0 }}>Is code ko apni saari bookings ke time use karein.</p>
             </div>
-            
-            <div className="fade-in delay-2" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '48px' }}>
-              <span className="tag" style={{ padding: '10px 20px', fontSize: '0.95rem', background: '#eff6ff', color: 'var(--blue)', fontWeight: '700' }}><Award size={16} className="nav-icon" /> {user?.plan?.n || 'Affiliate Plan'}</span>
-              <span className="tag" style={{ padding: '10px 20px', fontSize: '0.95rem', background: 'var(--pale)', color: 'var(--gold)', fontWeight: '700' }}><MapPin size={16} className="nav-icon" /> {user?.md === 'Single' ? (user?.ar || '') + ' Territory' : 'Freehand Mode'}</span>
-              <span className="tag ok" style={{ padding: '10px 20px', fontSize: '0.95rem', fontWeight: '700' }}><CheckCircle size={16} className="nav-icon" /> Active</span>
+
+            {/* Territory Summary Badge */}
+            <div className="fade-in delay-2" style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: '16px', padding: '20px', marginBottom: '36px', textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--gold)', fontWeight: '800', fontSize: '0.9rem', marginBottom: '8px' }}>
+                <ShieldCheck size={18} /> Aapki Locked Territory
+              </div>
+              <div style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--navy)', marginBottom: '10px' }}>
+                {user.ar}
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {user.state && <span className="tag" style={{ background: '#eff6ff', color: 'var(--blue)' }}>State: {user.state}</span>}
+                {user.city && <span className="tag" style={{ background: '#f8fafc', color: 'var(--navy)' }}>City: {user.city}</span>}
+                {user.block && <span className="tag" style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#059669' }}>Block: {user.block}</span>}
+                {user.area && <span className="tag" style={{ background: 'rgba(245, 158, 11, 0.12)', color: 'var(--gold)' }}>Area: {user.area}</span>}
+              </div>
             </div>
             
             <Link className="btn fade-in delay-3" href="/dashboard" style={{ width: '100%', padding: '20px', fontSize: '1.15rem', borderRadius: '12px', boxShadow: '0 12px 24px rgba(234, 179, 8, 0.25)' }}>

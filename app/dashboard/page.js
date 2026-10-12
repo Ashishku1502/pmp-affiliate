@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Map as MapIcon, BookOpen, ClipboardList, HelpCircle,
   Settings as SettingsIcon, TrendingUp, MapPin, AlertCircle,
   Lock, Check, CheckCircle, LogOut, Ticket, Award, IndianRupee, ShieldCheck,
-  Building, Home, User, Layers
+  Building, Home, User, Layers, Landmark
 } from 'lucide-react';
 
 const TABS = ['Dashboard', 'Territory', 'Learnings', 'Bookings', 'Help', 'Settings'];
@@ -204,11 +204,35 @@ export default function Dashboard() {
                   </p>
                 </div>
               </div>
-              <div style={{ padding: '20px', background: '#fff', border: '1px solid var(--line)', borderRadius: '16px' }}>
+              <div style={{ padding: '24px', background: '#fff', border: '1px solid var(--line)', borderRadius: '16px' }}>
                 {user.md === 'Single' ? (
-                  <p style={{ margin: 0, color: 'var(--navy)', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Lock size={18} style={{ color: 'var(--gold)' }} /> <strong>{user.ar}</strong> territory specifically aapke liye lock kar di gayi hai. Yahan koi aur affiliate kaam nahi karega.
-                  </p>
+                  <div>
+                    <p style={{ margin: '0 0 16px', color: 'var(--navy)', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Lock size={18} style={{ color: 'var(--gold)' }} /> <strong>{user.ar}</strong> territory specifically aapke liye lock kar di gayi hai. Yahan koi aur affiliate kaam nahi karega.
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                      {user.state && (
+                        <div style={{ background: '#eff6ff', padding: '8px 14px', borderRadius: '10px', fontSize: '0.85rem', color: 'var(--blue)', fontWeight: '700' }}>
+                          State: <b>{user.state}</b>
+                        </div>
+                      )}
+                      {user.city && (
+                        <div style={{ background: '#f8fafc', padding: '8px 14px', borderRadius: '10px', fontSize: '0.85rem', color: 'var(--navy)', border: '1px solid var(--line)', fontWeight: '700' }}>
+                          City: <b>{user.city}</b>
+                        </div>
+                      )}
+                      {user.block && (
+                        <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '8px 14px', borderRadius: '10px', fontSize: '0.85rem', color: '#059669', fontWeight: '700' }}>
+                          Block: <b>{user.block}</b>
+                        </div>
+                      )}
+                      {user.area && (
+                        <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '8px 14px', borderRadius: '10px', fontSize: '0.85rem', color: 'var(--gold)', fontWeight: '700' }}>
+                          Area: <b>{user.area}</b>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 ) : (
                   <p style={{ margin: 0, color: 'var(--navy)', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <MapIcon size={18} style={{ color: 'var(--blue)' }} /> Aap Freehand mode mein hain. Aap kisi bhi city ya zone mein kaam kar sakte hain.
@@ -219,14 +243,22 @@ export default function Dashboard() {
 
             <h3 style={{ margin: '0 0 20px', fontSize: '1.4rem', color: 'var(--navy)', display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={20} style={{ color: 'var(--blue)' }} /> Seat Locations</h3>
             {(() => {
-              const territoryCity = user?.ar ? user.ar.split(',')[0].trim().toLowerCase() : '';
               const filteredSeats = seats.filter((s) => {
                 if (user?.md !== 'Single') return true;
                 if (!s.a) return false;
-                const seatCity = s.a.toLowerCase().trim();
-                return seatCity === territoryCity || 
-                       (user?.ar && user.ar.toLowerCase().includes(seatCity)) || 
-                       seatCity.includes(territoryCity);
+                const seatLower = s.a.toLowerCase().trim();
+                const arLower = (user?.ar || '').toLowerCase();
+                const blockLower = (user?.block || '').toLowerCase();
+                const cityLower = (user?.city || '').toLowerCase();
+                const areaLower = (user?.area || '').toLowerCase();
+
+                return (
+                  (blockLower && (seatLower.includes(blockLower) || blockLower.includes(seatLower))) ||
+                  (cityLower && (seatLower.includes(cityLower) || cityLower.includes(seatLower))) ||
+                  (areaLower && (seatLower.includes(areaLower) || areaLower.includes(seatLower))) ||
+                  arLower.includes(seatLower) ||
+                  seatLower.includes(arLower.split(',')[0].trim())
+                );
               });
 
               if (filteredSeats.length === 0) {
