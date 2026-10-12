@@ -12,14 +12,20 @@ const dayMs = 24 * 60 * 60 * 1000;
 const d = new Date().getDay();
 
 const BASE_SEATS = [
-  { id: 0, t: 'MLA',    a: 'Budhana',    by: null, cand: null, paid: false, day: null, bookedAt: null },
-  { id: 1, t: 'Pradhan',a: 'Budhana',    by: null, cand: null, paid: false, day: null, bookedAt: null },
-  { id: 2, t: 'Pradhan',a: 'Charthawal', by: null, cand: null, paid: false, day: null, bookedAt: null },
-  { id: 3, t: 'MLA',    a: 'Khatauli',   by: null, cand: null, paid: false, day: null, bookedAt: null },
-  { id: 4, t: 'Pradhan',a: 'Khatauli',   by: null, cand: null, paid: false, day: null, bookedAt: null },
-  { id: 5, t: 'Pradhan',a: 'Purkazi',    by: null, cand: null, paid: false, day: null, bookedAt: null },
-  { id: 6, t: 'MLA',    a: 'Shahpur',    by: null, cand: null, paid: false, day: null, bookedAt: null },
-  { id: 7, t: 'Pradhan',a: 'Shahpur',    by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 0,  t: 'MLA',            a: 'Budhana',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 1,  t: 'Pradhan',        a: 'Budhana',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 2,  t: 'Pradhan',        a: 'Charthawal',    by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 3,  t: 'MLA',            a: 'Khatauli',      by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 4,  t: 'Pradhan',        a: 'Khatauli',      by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 5,  t: 'Pradhan',        a: 'Purkazi',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 6,  t: 'MLA',            a: 'Shahpur',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 7,  t: 'Pradhan',        a: 'Shahpur',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 8,  t: 'Zila Panchayat', a: 'Budhana',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 9,  t: 'Zila Panchayat', a: 'Khatauli',      by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 10, t: 'Zila Panchayat', a: 'Purkazi',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 11, t: 'Zila Panchayat', a: 'Shahpur',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 12, t: 'Zila Panchayat', a: 'Charthawal',    by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 13, t: 'Zila Panchayat', a: 'Muzaffarnagar', by: null, cand: null, paid: false, day: null, bookedAt: null },
 ];
 
 function loadUser() {
@@ -103,6 +109,15 @@ export default function AppProvider({ children }) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Booking failed.');
+
+    setSeats((prev) => prev.map((s) => s.id === id ? {
+      ...s,
+      by: user.code,
+      cand: f.candidate.trim(),
+      paid: !!f.paid,
+      day: new Date().getDay(),
+      bookedAt: Date.now()
+    } : s));
   }, [user]);
 
   const pay = useCallback(async (id) => {
@@ -141,6 +156,7 @@ export default function AppProvider({ children }) {
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Payment failed.');
+                setSeats((prev) => prev.map((s) => s.id === id ? { ...s, paid: true } : s));
                 resolve(true);
               } catch(e) {
                 reject(e);
@@ -164,6 +180,7 @@ export default function AppProvider({ children }) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Payment failed.');
+    setSeats((prev) => prev.map((s) => s.id === id ? { ...s, paid: true } : s));
   }, [user]);
 
   const logout = useCallback(() => {

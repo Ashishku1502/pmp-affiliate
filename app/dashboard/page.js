@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Map as MapIcon, BookOpen, ClipboardList, HelpCircle,
   Settings as SettingsIcon, TrendingUp, MapPin, AlertCircle,
   Lock, Check, CheckCircle, LogOut, Ticket, Award, IndianRupee, ShieldCheck,
-  Building, Home, User
+  Building, Home, User, Layers
 } from 'lucide-react';
 
 const TABS = ['Dashboard', 'Territory', 'Learnings', 'Bookings', 'Help', 'Settings'];
@@ -251,7 +251,7 @@ export default function Dashboard() {
                   {filteredSeats.map((s) => (
                     <div key={s.id} style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
                       <div style={{ padding: '12px', background: 'var(--pale)', borderRadius: '12px', color: 'var(--muted)' }}>
-                        {s.t === 'MLA' ? <Building size={20} /> : <Home size={20} />}
+                        {s.t === 'MLA' ? <Building size={20} /> : s.t === 'Zila Panchayat' ? <Layers size={20} style={{ color: '#10b981' }} /> : <Home size={20} />}
                       </div>
                       <div style={{ flex: 1 }}>
                         <h4 style={{ margin: '0 0 4px', fontSize: '1.1rem', color: 'var(--navy)' }}>{s.a}</h4>
@@ -348,7 +348,7 @@ export default function Dashboard() {
                   <div key={s.id} style={{ background: s.paid ? '#fff' : '#fff1f2', border: `1px solid ${s.paid ? 'var(--line)' : '#fecdd3'}`, borderRadius: '16px', padding: '24px', display: 'flex', flexWrap: 'wrap', gap: '24px', justifyContent: 'space-between', alignItems: 'center', boxShadow: s.paid ? '0 4px 12px rgba(0,0,0,0.02)' : '0 8px 24px rgba(225, 29, 72, 0.1)' }}>
                     <div style={{ flex: 1, minWidth: '200px' }}>
                       <div style={{ fontSize: '0.8rem', color: 'var(--muted)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        {s.t === 'MLA' ? <Building size={14} /> : <Home size={14} />} {s.t} Seat · {s.a}
+                        {s.t === 'MLA' ? <Building size={14} /> : s.t === 'Zila Panchayat' ? <Layers size={14} style={{ color: '#10b981' }} /> : <Home size={14} />} {s.t} Seat · {s.a}
                       </div>
                       <div style={{ fontWeight: '900', fontSize: '1.3rem', color: 'var(--navy)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <User size={18} style={{ color: 'var(--muted)' }} /> {s.cand}

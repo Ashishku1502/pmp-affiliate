@@ -1,15 +1,15 @@
 'use client';
 import { useApp } from '@/components/AppProvider';
-import { MapPin, Building, Home, CheckCircle2, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
+import { MapPin, Building, Home, CheckCircle2, Lock, ArrowRight, ShieldCheck, Layers } from 'lucide-react';
 import Link from 'next/link';
 
 const DEFAULT_SEATS = [
   { id: 0, t: 'MLA', a: 'Budhana', by: null },
   { id: 1, t: 'Pradhan', a: 'Budhana', by: null },
-  { id: 2, t: 'Pradhan', a: 'Charthawal', by: null },
+  { id: 8, t: 'Zila Panchayat', a: 'Budhana', by: null },
   { id: 3, t: 'MLA', a: 'Khatauli', by: null },
   { id: 4, t: 'Pradhan', a: 'Khatauli', by: null },
-  { id: 5, t: 'Pradhan', a: 'Purkazi', by: null },
+  { id: 9, t: 'Zila Panchayat', a: 'Khatauli', by: null },
 ];
 
 export default function SeatsPreview() {
@@ -70,14 +70,14 @@ export default function SeatsPreview() {
                         width: '38px', 
                         height: '38px', 
                         borderRadius: '10px', 
-                        background: s.t === 'MLA' ? 'rgba(59, 130, 246, 0.12)' : 'rgba(245, 158, 11, 0.12)', 
-                        color: s.t === 'MLA' ? 'var(--blue)' : 'var(--gold)', 
+                        background: s.t === 'MLA' ? 'rgba(59, 130, 246, 0.12)' : s.t === 'Zila Panchayat' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)', 
+                        color: s.t === 'MLA' ? 'var(--blue)' : s.t === 'Zila Panchayat' ? '#10b981' : 'var(--gold)', 
                         display: 'flex', 
                         alignItems: 'center', 
                         justifyContent: 'center' 
                       }}
                     >
-                      {s.t === 'MLA' ? <Building size={18} /> : <Home size={18} />}
+                      {s.t === 'MLA' ? <Building size={18} /> : s.t === 'Zila Panchayat' ? <Layers size={18} /> : <Home size={18} />}
                     </div>
                     <div>
                       <span 
@@ -89,7 +89,7 @@ export default function SeatsPreview() {
                           letterSpacing: '0.6px' 
                         }}
                       >
-                        {s.t === 'MLA' ? 'Assembly Seat' : 'Gram Pradhan Seat'}
+                        {s.t === 'MLA' ? 'Assembly Seat' : s.t === 'Zila Panchayat' ? 'Zila Panchayat Ward' : 'Gram Pradhan Seat'}
                       </span>
                     </div>
                   </div>
@@ -148,6 +148,8 @@ export default function SeatsPreview() {
                 <p style={{ color: 'var(--muted)', fontSize: '0.92rem', margin: '0 0 16px', lineHeight: '1.5' }}>
                   {s.t === 'MLA' 
                     ? `Assembly-level territory management & analytics rights for ${s.a}.`
+                    : s.t === 'Zila Panchayat'
+                    ? `District council & ward-level governance suite for ${s.a}.`
                     : `Village-level local body governance & campaign unit for ${s.a}.`}
                 </p>
 

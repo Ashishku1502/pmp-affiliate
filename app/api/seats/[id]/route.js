@@ -5,6 +5,23 @@ export const dynamic = 'force-dynamic';
 
 const err = (m, c = 400) => NextResponse.json({ error: m }, { status: c });
 
+const BASE_SEATS = [
+  { id: 0,  t: 'MLA',            a: 'Budhana',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 1,  t: 'Pradhan',        a: 'Budhana',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 2,  t: 'Pradhan',        a: 'Charthawal',    by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 3,  t: 'MLA',            a: 'Khatauli',      by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 4,  t: 'Pradhan',        a: 'Khatauli',      by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 5,  t: 'Pradhan',        a: 'Purkazi',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 6,  t: 'MLA',            a: 'Shahpur',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 7,  t: 'Pradhan',        a: 'Shahpur',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 8,  t: 'Zila Panchayat', a: 'Budhana',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 9,  t: 'Zila Panchayat', a: 'Khatauli',      by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 10, t: 'Zila Panchayat', a: 'Purkazi',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 11, t: 'Zila Panchayat', a: 'Shahpur',       by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 12, t: 'Zila Panchayat', a: 'Charthawal',    by: null, cand: null, paid: false, day: null, bookedAt: null },
+  { id: 13, t: 'Zila Panchayat', a: 'Muzaffarnagar', by: null, cand: null, paid: false, day: null, bookedAt: null },
+];
+
 // POST /api/seats/:id  { action:'book'|'pay', code, candidate, mobile, paid }
 export async function POST(req, { params }) {
   const { id } = await params;
@@ -16,10 +33,17 @@ export async function POST(req, { params }) {
 
     const [seatSnap, affSnap] = await Promise.all([seatRef.get(), affRef.get()]);
 
-    if (!seatSnap.exists) return err('Seat nahi mili.',         404);
     if (!affSnap.exists)  return err('Affiliate code galat hai.', 401);
 
-    const seat = seatSnap.data();
+    let seat;
+    if (!seatSnap.exists) {
+      const baseSeat = BASE_SEATS.find(s => String(s.id) === String(id));
+      if (!baseSeat) return err('Seat nahi mili.', 404);
+      await seatRef.set(baseSeat);
+      seat = baseSeat;
+    } else {
+      seat = seatSnap.data();
+    }
     const aff  = affSnap.data();
 
     // ── BOOK ───────────────────────────────────────────────
