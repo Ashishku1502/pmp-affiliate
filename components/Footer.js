@@ -353,11 +353,8 @@ export default function Footer() {
               </button>
             </div>
 
-            {/* Back To Top & Made In India badge */}
+            {/* Back To Top */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                Made in India 🇮🇳
-              </span>
               <button
                 type="button"
                 onClick={scrollToTop}
