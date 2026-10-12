@@ -171,6 +171,11 @@ export default function Join() {
         if (!selectedCity) { setErr('Kripya City/District chunein.'); return; }
         if (isCustomBlock && !customBlock.trim()) { setErr('Kripya apne Block ka naam darj karein.'); return; }
       }
+      if (!f.n.trim() || f.m.trim().length < 10) {
+        setErr('Territory chun li gayi hai! Kripya ab apna Naam aur Mobile number darj karein.');
+        setStep(0);
+        return;
+      }
       setStep(3);
       return;
     }
@@ -269,6 +274,30 @@ export default function Join() {
           <p style={{ color: 'var(--muted)', fontSize: '1.05rem', margin: 0 }}>
             Poll Craft Analytics ground network ka hissa banein aur exclusive territory lock karein.
           </p>
+          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+            <button
+              type="button"
+              id="open-territory-pill-btn"
+              onClick={() => { setErr(''); setStep(2); }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 18px',
+                borderRadius: '99px',
+                background: s === 2 ? 'var(--navy)' : 'rgba(245, 158, 11, 0.12)',
+                color: s === 2 ? '#fff' : 'var(--gold)',
+                border: s === 2 ? '1px solid var(--navy)' : '1px solid rgba(245, 158, 11, 0.35)',
+                fontSize: '0.88rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: s === 2 ? '0 4px 12px rgba(15,23,42,0.15)' : 'none'
+              }}
+            >
+              <MapPin size={15} /> {s === 2 ? 'Territory Step Active Hai' : '🗺️ Click Open Territory (Area & Block)'}
+            </button>
+          </div>
         </div>
 
         {/* Stepper Progress (Clickable) */}
@@ -281,12 +310,12 @@ export default function Join() {
               key={t} 
               id={`stepper-step-${t.toLowerCase()}`}
               onClick={() => {
-                // Allow direct navigation to steps
-                if (i <= s || (i === 2 && f.n && f.m.length >= 10)) {
-                  setErr('');
-                  setStep(i);
-                }
+                setErr('');
+                setStep(i);
               }}
+              role="button"
+              tabIndex={0}
+              title={`Step ${i + 1}: ${t} par click karein`}
               style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
@@ -294,13 +323,16 @@ export default function Join() {
                 gap: '6px', 
                 zIndex: 1, 
                 minWidth: '44px',
-                cursor: i <= s ? 'pointer' : 'default'
+                cursor: 'pointer',
+                padding: '4px',
+                borderRadius: '8px',
+                transition: 'all 0.2s ease'
               }}
             >
               <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: i <= s ? 'var(--gold)' : 'var(--bg)', border: i <= s ? '2px solid var(--gold)' : '2px solid var(--line)', color: i <= s ? '#fff' : 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '0.8rem', transition: 'all 0.3s ease' }}>
                 {i < s ? <CheckCircle size={15} /> : i + 1}
               </div>
-              <span style={{ fontSize: 'clamp(0.65rem, 2vw, 0.75rem)', fontWeight: i === s ? '800' : '600', color: i <= s ? 'var(--navy)' : 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <span style={{ fontSize: 'clamp(0.65rem, 2vw, 0.75rem)', fontWeight: i === s ? '800' : '600', color: i === s ? 'var(--gold)' : i <= s ? 'var(--navy)' : 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 {t}
               </span>
             </div>
@@ -324,6 +356,23 @@ export default function Join() {
               </div>
               <h2 style={{ fontSize: '1.6rem', margin: '0 0 8px', color: 'var(--navy)' }}>Personal Details</h2>
               <p style={{ color: 'var(--muted)', fontSize: '0.95rem', margin: 0 }}>Aapki jankari poori tarah surakshit hai.</p>
+            </div>
+
+            <div style={{ marginBottom: '24px', background: '#f8fafc', padding: '14px 18px', borderRadius: '12px', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <MapPin size={16} style={{ color: 'var(--gold)' }} />
+                <span style={{ fontSize: '0.88rem', color: 'var(--navy)' }}>
+                  Assigned Territory: <strong>{f.ar}</strong>
+                </span>
+              </div>
+              <button
+                type="button"
+                id="step0-open-territory-link"
+                onClick={() => { setErr(''); setStep(2); }}
+                style={{ background: 'none', border: 'none', color: 'var(--blue)', fontWeight: '700', fontSize: '0.85rem', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                Area & Block Badlein →
+              </button>
             </div>
             
             <div style={{ marginBottom: '24px' }}>
